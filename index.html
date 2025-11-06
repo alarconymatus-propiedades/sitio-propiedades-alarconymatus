@@ -3,19 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Alarcón & Matus Propiedades</title>
+  <title>AYM Propiedades</title>
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Paleta basada en el logo (dorado/bronce)
+    // Ajusta los hex si quieres un tono diferente
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  "#fff8ef",
+              100: "#feeecd",
+              200: "#fbd898",
+              300: "#f4ba5b",
+              400: "#e49a2f", /* dorado medio */
+              500: "#d28927", /* dorado AYM */
+              600: "#b8721f",
+              700: "#8f5516",
+              800: "#6b3e12",
+              900: "#3b2109",
+            }
+          },
+          dropShadow: {
+            brand: "0 2px 0 rgba(0,0,0,.15)",
+          }
+        }
+      }
+    }
+  </script>
+
   <!-- React 18 + ReactDOM UMD -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <!-- Babel para poder usar JSX en el navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Favicon (usa tu logo) -->
+  <link rel="icon" type="image/png" href="assets/aym-logo.png" />
 </head>
 <body class="bg-gray-50 text-gray-900">
   <div id="root"></div>
 
   <script type="text/babel">
+    // ======= DATA =======
     const PROPS = [
       {
         id: "AM-001",
@@ -25,20 +58,12 @@
         region: "Valparaíso",
         precio: 680000,
         moneda: "CLP",
-        dormitorios: 3,
-        banos: 2,
-        estacionamientos: 1,
-        terreno_m2: 250,
-        construidos_m2: 95,
+        dormitorios: 3, banos: 2, estacionamientos: 1,
+        terreno_m2: 250, construidos_m2: 95,
         destacado: true,
         etiquetas: ["Cercano a Metro", "Patio", "Bodega"],
-        descripcion:
-          "Casa luminosa en pasaje tranquilo. Cocina cerrada, living-comedor, patio y estacionamiento para 1 vehículo.",
-        imagenes: [
-          "https://picsum.photos/id/1018/1200/800",
-          "https://picsum.photos/id/1025/1200/800",
-          "https://picsum.photos/id/1043/1200/800",
-        ],
+        descripcion: "Casa luminosa en pasaje tranquilo. Cocina cerrada, living-comedor, patio y estacionamiento para 1 vehículo.",
+        imagenes: ["https://picsum.photos/id/1018/1200/800","https://picsum.photos/id/1025/1200/800","https://picsum.photos/id/1043/1200/800"],
         whatsapp: "+56912345678",
         contactoEmail: "contacto@alarconymatus.cl",
       },
@@ -46,23 +71,14 @@
         id: "AM-002",
         titulo: "Departamento 2D/1B – Quilpué Centro",
         operacion: "venta",
-        comuna: "Quilpué",
-        region: "Valparaíso",
-        precio: 78900000,
-        moneda: "CLP",
-        dormitorios: 2,
-        banos: 1,
-        estacionamientos: 0,
-        terreno_m2: null,
-        construidos_m2: 56,
+        comuna: "Quilpué", region: "Valparaíso",
+        precio: 78900000, moneda: "CLP",
+        dormitorios: 2, banos: 1, estacionamientos: 0,
+        terreno_m2: null, construidos_m2: 56,
         destacado: false,
-        etiquetas: ["Locación céntrica", "Bajas GGCC"],
-        descripcion:
-          "A pasos de comercio, locomoción y servicios. Ideal para primera vivienda o inversión.",
-        imagenes: [
-          "https://picsum.photos/id/1067/1200/800",
-          "https://picsum.photos/id/1060/1200/800",
-        ],
+        etiquetas: ["Locación céntrica","Bajas GGCC"],
+        descripcion: "A pasos de comercio, locomoción y servicios. Ideal para primera vivienda o inversión.",
+        imagenes: ["https://picsum.photos/id/1067/1200/800","https://picsum.photos/id/1060/1200/800"],
         whatsapp: "+56912345678",
         contactoEmail: "contacto@alarconymatus.cl",
       },
@@ -70,28 +86,20 @@
         id: "AM-003",
         titulo: "Parcela 5000 m² – Sector Los Pinos",
         operacion: "venta",
-        comuna: "Quilpué",
-        region: "Valparaíso",
-        precio: 39900000,
-        moneda: "CLP",
-        dormitorios: 0,
-        banos: 0,
-        estacionamientos: 0,
-        terreno_m2: 5000,
-        construidos_m2: 0,
+        comuna: "Quilpué", region: "Valparaíso",
+        precio: 39900000, moneda: "CLP",
+        dormitorios: 0, banos: 0, estacionamientos: 0,
+        terreno_m2: 5000, construidos_m2: 0,
         destacado: true,
-        etiquetas: ["Factibilidad eléctrica", "Agua en gestión"],
-        descripcion:
-          "Terreno plano con excelente conectividad. Ideal para proyecto familiar o inversión.",
-        imagenes: [
-          "https://picsum.photos/id/1040/1200/800",
-          "https://picsum.photos/id/1039/1200/800",
-        ],
+        etiquetas: ["Factibilidad eléctrica","Agua en gestión"],
+        descripcion: "Terreno plano con excelente conectividad. Ideal para proyecto familiar o inversión.",
+        imagenes: ["https://picsum.photos/id/1040/1200/800","https://picsum.photos/id/1039/1200/800"],
         whatsapp: "+56912345678",
         contactoEmail: "contacto@alarconymatus.cl",
       },
     ];
 
+    // ======= UI Helpers =======
     const currency = (v, cur = "CLP") =>
       new Intl.NumberFormat("es-CL", { style: "currency", currency: cur }).format(v);
 
@@ -105,7 +113,7 @@
       <button
         onClick={onClick}
         className={`rounded-full px-3 py-1 text-sm border transition ${
-          active ? "bg-black text-white border-black" : "bg-white border-gray-300 hover:bg-gray-50"
+          active ? "bg-brand-600 text-white border-brand-700" : "bg-white border-gray-300 hover:bg-brand-50"
         }`}
       >
         {children}
@@ -115,14 +123,14 @@
     const Input = (props) => (
       <input
         {...props}
-        className={`w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black ${props.className || ""}`}
+        className={`w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 ${props.className||""}`}
       />
     );
 
     const Select = (props) => (
       <select
         {...props}
-        className={`w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black ${props.className || ""}`}
+        className={`w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 ${props.className||""}`}
       />
     );
 
@@ -136,21 +144,24 @@
       </section>
     );
 
+    // ======= Components =======
     function PropertyCard({ p, onOpen }) {
       return (
         <div className="group rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition bg-white">
           <div className="relative aspect-[4/3] overflow-hidden">
             <img src={p.imagenes?.[0]} alt={p.titulo} className="h-full w-full object-cover group-hover:scale-105 transition" />
             {p.destacado && (
-              <div className="absolute top-3 left-3 bg-black/80 text-white text-xs px-2 py-1 rounded-full">Destacado</div>
+              <div className="absolute top-3 left-3 bg-brand-700/90 text-white text-xs px-2 py-1 rounded-full drop-shadow-md">Destacado</div>
             )}
           </div>
           <div className="p-4 space-y-3">
             <div className="flex items-start justify-between gap-3">
               <h3 className="font-semibold leading-snug">{p.titulo}</h3>
-              <Badge className="shrink-0">{p.operacion === "venta" ? "Venta" : "Arriendo"}</Badge>
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-brand-50 text-brand-800 border border-brand-200">
+                {p.operacion === "venta" ? "Venta" : "Arriendo"}
+              </span>
             </div>
-            <div className="text-lg font-bold">{currency(p.precio, p.moneda)}</div>
+            <div className="text-lg font-bold text-brand-700">{currency(p.precio, p.moneda)}</div>
             <p className="text-sm text-gray-600">{p.comuna}, {p.region}</p>
             <div className="flex flex-wrap gap-2">
               {p.dormitorios > 0 && <Badge>{p.dormitorios}D</Badge>}
@@ -159,9 +170,7 @@
               {p.terreno_m2 > 0 && <Badge>{p.terreno_m2} m² terr.</Badge>}
             </div>
             <div className="flex items-center gap-2 pt-1">
-              {p.etiquetas?.slice(0, 3).map((e) => (
-                <span key={e} className="text-xs text-gray-500">#{e}</span>
-              ))}
+              {p.etiquetas?.slice(0,3).map((e) => <span key={e} className="text-xs text-gray-500">#{e}</span>)}
             </div>
             <div className="pt-2 flex gap-2">
               <a
@@ -169,16 +178,12 @@
                   `Hola, me interesa la propiedad ${p.id} (${p.titulo}). ¿Sigue disponible?`
                 )}`}
                 target="_blank" rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
-              >
-                WhatsApp
-              </a>
+                className="inline-flex items-center justify-center rounded-xl border border-brand-300 text-brand-800 px-3 py-2 text-sm hover:bg-brand-50"
+              >WhatsApp</a>
               <button
                 onClick={() => onOpen(p)}
-                className="inline-flex items-center justify-center rounded-xl bg-black text-white px-3 py-2 text-sm hover:opacity-90"
-              >
-                Ver ficha
-              </button>
+                className="inline-flex items-center justify-center rounded-xl bg-brand-600 text-white px-3 py-2 text-sm hover:bg-brand-700"
+              >Ver ficha</button>
             </div>
           </div>
         </div>
@@ -198,11 +203,13 @@
             <div className="p-4 overflow-y-auto space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {p.imagenes?.map((src, i) => (
-                  <img key={i} src={src} alt={`${p.titulo} ${i + 1}`} className="w-full h-48 object-cover rounded-xl" />
+                  <img key={i} src={src} alt={`${p.titulo} ${i+1}`} className="w-full h-48 object-cover rounded-xl" />
                 ))}
               </div>
               <div className="space-y-2">
-                <div className="text-2xl font-bold">{currency(p.precio, p.moneda)} {p.operacion === "venta" ? "• Venta" : "• Arriendo"}</div>
+                <div className="text-2xl font-bold text-brand-700">
+                  {currency(p.precio, p.moneda)} {p.operacion === "venta" ? "• Venta" : "• Arriendo"}
+                </div>
                 <div className="text-gray-700">{p.comuna}, {p.region}</div>
                 <p className="text-gray-700 leading-relaxed">{p.descripcion}</p>
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -221,18 +228,14 @@
                     `Hola, me interesa la propiedad ${p.id} (${p.titulo}).\n\nPor favor, contáctenme para coordinar una visita.\n\nGracias.`
                   )}`}
                   className="rounded-xl border px-3 py-2 text-sm hover:bg-gray-50"
-                >
-                  Email
-                </a>
+                >Email</a>
                 <a
                   href={`https://wa.me/${p.whatsapp.replace(/[^\\d]/g, "")}?text=${encodeURIComponent(
                     `Hola, me interesa la propiedad ${p.id} (${p.titulo}). ¿Sigue disponible?`
                   )}`}
                   target="_blank" rel="noreferrer"
-                  className="rounded-xl bg-black text-white px-3 py-2 text-sm hover:opacity-90"
-                >
-                  WhatsApp
-                </a>
+                  className="rounded-xl bg-brand-600 text-white px-3 py-2 text-sm hover:bg-brand-700"
+                >WhatsApp</a>
               </div>
             </div>
           </div>
@@ -240,6 +243,7 @@
       );
     }
 
+    // ======= App =======
     function App() {
       const { useMemo, useState } = React;
       const [query, setQuery] = useState("");
@@ -277,14 +281,9 @@
         if (dorms !== "todas") data = data.filter((p) => p.dormitorios === Number(dorms));
 
         switch (sort) {
-          case "precio_asc":
-            data.sort((a, b) => a.precio - b.precio);
-            break;
-          case "precio_desc":
-            data.sort((a, b) => b.precio - a.precio);
-            break;
-          default:
-            data.sort((a, b) => Number(b.destacado) - Number(a.destacado) || String(b.id).localeCompare(String(a.id)));
+          case "precio_asc": data.sort((a,b)=>a.precio-b.precio); break;
+          case "precio_desc": data.sort((a,b)=>b.precio-a.precio); break;
+          default: data.sort((a,b)=> Number(b.destacado)-Number(a.destacado) || String(b.id).localeCompare(String(a.id)));
         }
         return data;
       }, [op, comuna, query, min, max, dorms, sort]);
@@ -292,59 +291,63 @@
       const openFicha = (p) => { setSelected(p); setOpen(true); };
 
       return (
-        <div className="min-h-screen">
-          <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
+        <div className="min-h-screen bg-gradient-to-b from-brand-50 to-gray-50">
+          {/* NAV */}
+          <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
-              <a href="#home" className="font-bold text-lg">Alarcón & Matus Propiedades</a>
+              <a href="#home" className="flex items-center gap-3">
+                <img src="assets/aym-logo.png" alt="AYM Propiedades" className="h-8 w-auto drop-shadow-brand" />
+                <span className="font-bold text-lg tracking-tight text-brand-800">AYM Propiedades</span>
+              </a>
               <div className="hidden md:flex items-center gap-6 text-sm">
-                <a href="#listados" className="hover:opacity-70">Listados</a>
-                <a href="#servicios" className="hover:opacity-70">Servicios</a>
-                <a href="#contacto" className="hover:opacity-70">Contacto</a>
+                <a href="#listados" className="hover:text-brand-700">Listados</a>
+                <a href="#servicios" className="hover:text-brand-700">Servicios</a>
+                <a href="#contacto" className="hover:text-brand-700">Contacto</a>
                 <a
                   href={`https://wa.me/${PROPS[0].whatsapp.replace(/[^\\d]/g, "")}?text=${encodeURIComponent(
                     "Hola, quiero publicar mi propiedad / consultar disponibilidad."
                   )}`}
                   target="_blank" rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-black text-white px-3 py-2 hover:opacity-90"
-                >
-                  WhatsApp
-                </a>
+                  className="inline-flex items-center justify-center rounded-xl bg-brand-600 text-white px-3 py-2 hover:bg-brand-700"
+                >WhatsApp</a>
               </div>
             </div>
           </nav>
 
+          {/* HERO */}
           <header id="home" className="relative overflow-hidden">
             <div className="absolute inset-0 -z-10">
-              <div className="h-full w-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-gray-100 via-white to-gray-100" />
+              <div className="h-full w-full bg-gradient-to-br from-brand-100 via-white to-brand-50" />
             </div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="space-y-6">
-                  <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
-                    Publica, vende y arrienda con <span className="underline decoration-gray-300">confianza</span>
+                  <h1 className="text-3xl md:text-5xl font-extrabold leading-tight text-brand-900">
+                    AYM Propiedades: <span className="text-brand-600">venta y arriendo</span> con confianza
                   </h1>
-                  <p className="text-gray-600 md:text-lg">
-                    Gestión integral de propiedades en la Región de Valparaíso. Transparencia, velocidad y un servicio cercano.
+                  <p className="text-gray-700 md:text-lg">
+                    Gestión integral en Valparaíso: difusión, selección de inquilinos, contratos y reportes al propietario.
                   </p>
                   <div className="flex gap-3">
-                    <a href="#listados" className="rounded-xl bg-black text-white px-4 py-2 text-sm md:text-base">Ver propiedades</a>
-                    <a href="#contacto" className="rounded-xl border px-4 py-2 text-sm md:text-base">Publica la tuya</a>
+                    <a href="#listados" className="rounded-xl bg-brand-600 text-white px-4 py-2 text-sm md:text-base hover:bg-brand-700">Ver propiedades</a>
+                    <a href="#contacto" className="rounded-xl border border-brand-300 text-brand-800 px-4 py-2 text-sm md:text-base hover:bg-brand-50">Publica la tuya</a>
                   </div>
-                  <div className="flex items-center gap-4 pt-2 text-sm text-gray-600">
-                    <span>✓ Contratos y filtros de inquilinos</span>
-                    <span>✓ Reportes al propietario</span>
+                  <div className="flex items-center gap-4 pt-2 text-sm text-brand-800">
+                    <span>✓ Filtros de inquilinos</span>
+                    <span>✓ Contratos y seguimiento</span>
                     <span>✓ Fotos y difusión</span>
                   </div>
                 </div>
-                <div className="rounded-3xl overflow-hidden shadow-lg">
+                <div className="rounded-3xl overflow-hidden shadow-lg ring-1 ring-brand-200/50">
                   <img src="https://picsum.photos/id/1003/1200/800" alt="Hero" className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
           </header>
 
+          {/* BUSCADOR + LISTADOS */}
           <Section id="listados" title="Propiedades disponibles" subtitle="Filtra por operación, comuna, precio y dormitorios.">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-3 bg-white p-4 rounded-2xl border">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3 bg-white p-4 rounded-2xl border border-brand-100">
               <Select value={op} onChange={(e) => setOp(e.target.value)}>
                 <option value="todas">Todas</option>
                 <option value="venta">Venta</option>
@@ -352,7 +355,7 @@
               </Select>
 
               <Select value={comuna} onChange={(e) => setComuna(e.target.value)}>
-                {["todas", ...Array.from(new Set(PROPS.map(p => p.comuna)))].map((c) => (
+                {["todas", ...Array.from(new Set(PROPS.map((p) => p.comuna)))].map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </Select>
@@ -374,16 +377,10 @@
               <div className="col-span-2 md:col-span-6">
                 <Input placeholder="Buscar por título, comuna, etiqueta…" value={query} onChange={(e) => setQuery(e.target.value)} />
               </div>
-
-              <div className="md:col-span-6 flex flex-wrap gap-2">
-                <Chip active={op === "venta"} onClick={() => setOp("venta")}>Solo Venta</Chip>
-                <Chip active={op === "arriendo"} onClick={() => setOp("arriendo")}>Solo Arriendo</Chip>
-                <Chip active={op === "todas"} onClick={() => setOp("todas")}>Todas</Chip>
-              </div>
             </div>
 
             <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((p) => (<PropertyCard key={p.id} p={p} onOpen={(x)=>{openFicha(x)}} />))}
+              {filtered.map((p) => (<PropertyCard key={p.id} p={p} onOpen={(x)=>{setSelected(x); setOpen(true);}} />))}
               {filtered.length === 0 && (
                 <div className="col-span-full text-center text-gray-500 py-12 border rounded-2xl bg-white">
                   No se encontraron propiedades con esos filtros.
@@ -392,6 +389,7 @@
             </div>
           </Section>
 
+          {/* SERVICIOS */}
           <Section id="servicios" title="Servicios para propietarios" subtitle="Nos encargamos de punta a punta para que no te preocupes de nada.">
             <div className="grid md:grid-cols-3 gap-6">
               {[
@@ -399,14 +397,15 @@
                 { t: "Selección de Inquilinos", d: "Pre-evaluación, verificación de antecedentes y scoring." },
                 { t: "Gestión de Contratos", d: "Borradores, firmas y renovación o término." },
               ].map((s) => (
-                <div key={s.t} className="rounded-2xl border bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold mb-2">{s.t}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{s.d}</p>
+                <div key={s.t} className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+                  <h3 className="font-semibold mb-2 text-brand-900">{s.t}</h3>
+                  <p className="text-gray-700 text-sm leading-relaxed">{s.d}</p>
                 </div>
               ))}
             </div>
           </Section>
 
+          {/* CONTACTO */}
           <Section id="contacto" title="Contacto" subtitle="Cuéntanos tu necesidad o publica tu propiedad.">
             <div className="grid md:grid-cols-2 gap-8">
               <form
@@ -421,7 +420,7 @@
                   )}`;
                   window.open(url, "_blank");
                 }}
-                className="bg-white rounded-2xl border p-6 space-y-4 shadow-sm"
+                className="bg-white rounded-2xl border border-brand-100 p-6 space-y-4 shadow-sm"
               >
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
@@ -436,24 +435,26 @@
                 <div>
                   <label className="text-sm">Mensaje</label>
                   <textarea name="mensaje" required placeholder="Quiero publicar mi casa / consultar por AM-001"
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black min-h-[120px]"></textarea>
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 min-h-[120px]"></textarea>
                 </div>
                 <div className="flex gap-3">
-                  <button type="submit" className="rounded-xl bg-black text-white px-4 py-2 text-sm">Enviar por WhatsApp</button>
+                  <button type="submit" className="rounded-xl bg-brand-600 text-white px-4 py-2 text-sm hover:bg-brand-700">
+                    Enviar por WhatsApp
+                  </button>
                   <a href={`mailto:${PROPS[0].contactoEmail}?subject=${encodeURIComponent("Consulta desde el sitio web")}`}
-                    className="rounded-xl border px-4 py-2 text-sm">Enviar por Email</a>
+                    className="rounded-xl border border-brand-300 text-brand-800 px-4 py-2 text-sm hover:bg-brand-50">Enviar por Email</a>
                 </div>
               </form>
               <div className="space-y-4">
-                <div className="rounded-2xl border bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold mb-2">Datos de contacto</h3>
-                  <p className="text-sm text-gray-700">Alarcón & Matus Propiedades</p>
+                <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+                  <h3 className="font-semibold mb-2 text-brand-900">Datos de contacto</h3>
+                  <p className="text-sm text-gray-700">AYM Propiedades</p>
                   <p className="text-sm text-gray-700">Región de Valparaíso, Chile</p>
                   <p className="text-sm text-gray-700">WhatsApp: {PROPS[0].whatsapp}</p>
                   <p className="text-sm text-gray-700">Email: {PROPS[0].contactoEmail}</p>
                 </div>
-                <div className="rounded-2xl border bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold mb-2">Preguntas frecuentes</h3>
+                <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+                  <h3 className="font-semibold mb-2 text-brand-900">Preguntas frecuentes</h3>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-2">
                     <li>¿Cómo agrego una propiedad? Edita el arreglo <code>PROPS</code> al inicio.</li>
                     <li>¿Puedo usar dominio propio? Sí, con GitHub Pages, Netlify o Vercel.</li>
@@ -464,13 +465,17 @@
             </div>
           </Section>
 
+          {/* FOOTER */}
           <footer className="border-t">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-gray-600 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-              <p>© {new Date().getFullYear()} Alarcón & Matus Propiedades. Todos los derechos reservados.</p>
+              <div className="flex items-center gap-3">
+                <img src="assets/aym-logo.png" alt="AYM" className="h-6 w-auto" />
+                <p>© <span id="y">{new Date().getFullYear()}</span> AYM Propiedades. Todos los derechos reservados.</p>
+              </div>
               <div className="flex gap-4">
-                <a href="#home" className="hover:opacity-70">Inicio</a>
-                <a href="#listados" className="hover:opacity-70">Propiedades</a>
-                <a href="#contacto" className="hover:opacity-70">Contacto</a>
+                <a href="#home" className="hover:text-brand-700">Inicio</a>
+                <a href="#listados" className="hover:text-brand-700">Propiedades</a>
+                <a href="#contacto" className="hover:text-brand-700">Contacto</a>
               </div>
             </div>
           </footer>
