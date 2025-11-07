@@ -10,30 +10,34 @@
   <script>
     // Paleta basada en el logo (dorado/bronce)
     // Ajusta los hex si quieres un tono diferente
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50:  "#fff8ef",
-              100: "#feeecd",
-              200: "#fbd898",
-              300: "#f4ba5b",
-              400: "#e49a2f", /* dorado medio */
-              500: "#d28927", /* dorado AYM */
-              600: "#b8721f",
-              700: "#8f5516",
-              800: "#6b3e12",
-              900: "#3b2109",
-            }
-          },
-          dropShadow: {
-            brand: "0 2px 0 rgba(0,0,0,.15)",
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            50:  "#FFF4E6",
+            100: "#FDE9CC",
+            200: "#F7D7A3",
+            300: "#F4C06A", /* claro */
+            400: "#E89D38",
+            500: "#D18A2A", /* dorado AYM (principal) */
+            600: "#B8721F",
+            700: "#8F5516", /* oscuro */
+            800: "#6B3E12",
+            900: "#3B2109",
           }
+        },
+        dropShadow: {
+          brand: "0 2px 0 rgba(0,0,0,.18)",
+        },
+        gradientColorStops: {
+          'brand-soft-start': '#FFF4E6',
+          'brand-soft-end':   '#FDE9CC'
         }
       }
     }
-  </script>
+  }
+</script>
 
   <!-- React 18 + ReactDOM UMD -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
