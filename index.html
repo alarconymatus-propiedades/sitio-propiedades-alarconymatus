@@ -8,36 +8,31 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Paleta basada en el logo (dorado/bronce)
-    // Ajusta los hex si quieres un tono diferente
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          brand: {
-            50:  "#FFF4E6",
-            100: "#FDE9CC",
-            200: "#F7D7A3",
-            300: "#F4C06A", /* claro */
-            400: "#E89D38",
-            500: "#D18A2A", /* dorado AYM (principal) */
-            600: "#B8721F",
-            700: "#8F5516", /* oscuro */
-            800: "#6B3E12",
-            900: "#3B2109",
+    // Paleta AYM (dorado/bronce) — puedes ajustar los hex si lo deseas
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  "#FFF4E6",
+              100: "#FDE9CC",
+              200: "#F7D7A3",
+              300: "#F4C06A", /* claro */
+              400: "#E89D38",
+              500: "#D18A2A", /* principal */
+              600: "#B8721F",
+              700: "#8F5516", /* oscuro */
+              800: "#6B3E12",
+              900: "#3B2109",
+            }
+          },
+          dropShadow: {
+            brand: "0 2px 0 rgba(0,0,0,.18)",
           }
-        },
-        dropShadow: {
-          brand: "0 2px 0 rgba(0,0,0,.18)",
-        },
-        gradientColorStops: {
-          'brand-soft-start': '#FFF4E6',
-          'brand-soft-end':   '#FDE9CC'
         }
       }
     }
-  }
-</script>
+  </script>
 
   <!-- React 18 + ReactDOM UMD -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -45,14 +40,14 @@
   <!-- Babel para poder usar JSX en el navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Favicon (usa tu logo) -->
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/aym-logo.png" />
 </head>
 <body class="bg-gray-50 text-gray-900">
   <div id="root"></div>
 
   <script type="text/babel">
-    // ======= DATA =======
+    // ======= DATA (edita acá tus propiedades) =======
     const PROPS = [
       {
         id: "AM-001",
@@ -67,7 +62,11 @@
         destacado: true,
         etiquetas: ["Cercano a Metro", "Patio", "Bodega"],
         descripcion: "Casa luminosa en pasaje tranquilo. Cocina cerrada, living-comedor, patio y estacionamiento para 1 vehículo.",
-        imagenes: ["https://picsum.photos/id/1018/1200/800","https://picsum.photos/id/1025/1200/800","https://picsum.photos/id/1043/1200/800"],
+        imagenes: [
+          "https://picsum.photos/id/1018/1200/800",
+          "https://picsum.photos/id/1025/1200/800",
+          "https://picsum.photos/id/1043/1200/800",
+        ],
         whatsapp: "+56912345678",
         contactoEmail: "contacto@alarconymatus.cl",
       },
@@ -82,7 +81,10 @@
         destacado: false,
         etiquetas: ["Locación céntrica","Bajas GGCC"],
         descripcion: "A pasos de comercio, locomoción y servicios. Ideal para primera vivienda o inversión.",
-        imagenes: ["https://picsum.photos/id/1067/1200/800","https://picsum.photos/id/1060/1200/800"],
+        imagenes: [
+          "https://picsum.photos/id/1067/1200/800",
+          "https://picsum.photos/id/1060/1200/800",
+        ],
         whatsapp: "+56912345678",
         contactoEmail: "contacto@alarconymatus.cl",
       },
@@ -97,7 +99,10 @@
         destacado: true,
         etiquetas: ["Factibilidad eléctrica","Agua en gestión"],
         descripcion: "Terreno plano con excelente conectividad. Ideal para proyecto familiar o inversión.",
-        imagenes: ["https://picsum.photos/id/1040/1200/800","https://picsum.photos/id/1039/1200/800"],
+        imagenes: [
+          "https://picsum.photos/id/1040/1200/800",
+          "https://picsum.photos/id/1039/1200/800",
+        ],
         whatsapp: "+56912345678",
         contactoEmail: "contacto@alarconymatus.cl",
       },
@@ -155,7 +160,7 @@
           <div className="relative aspect-[4/3] overflow-hidden">
             <img src={p.imagenes?.[0]} alt={p.titulo} className="h-full w-full object-cover group-hover:scale-105 transition" />
             {p.destacado && (
-              <div className="absolute top-3 left-3 bg-brand-700/90 text-white text-xs px-2 py-1 rounded-full drop-shadow-md">Destacado</div>
+              <div className="absolute top-3 left-3 bg-brand-700/90 text-white text-xs px-2 py-1 rounded-full">Destacado</div>
             )}
           </div>
           <div className="p-4 space-y-3">
@@ -260,8 +265,6 @@
       const [open, setOpen] = useState(false);
       const [selected, setSelected] = useState(null);
 
-      const comunas = useMemo(() => ["todas", ...Array.from(new Set(PROPS.map((p) => p.comuna)))], []);
-
       const filtered = useMemo(() => {
         let data = [...PROPS];
         if (op !== "todas") data = data.filter((p) => p.operacion === op);
@@ -297,7 +300,7 @@
       return (
         <div className="min-h-screen bg-gradient-to-b from-brand-50 to-gray-50">
           {/* NAV */}
-          <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b">
+          <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-brand-100">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
               <a href="#home" className="flex items-center gap-3">
                 <img src="assets/aym-logo.png" alt="AYM Propiedades" className="h-8 w-auto drop-shadow-brand" />
@@ -321,7 +324,7 @@
           {/* HERO */}
           <header id="home" className="relative overflow-hidden">
             <div className="absolute inset-0 -z-10">
-              <div className="h-full w-full bg-gradient-to-br from-brand-100 via-white to-brand-50" />
+              <div className="h-full w-full bg-gradient-to-br from-brand-50 via-white to-brand-100" />
             </div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -343,7 +346,7 @@
                   </div>
                 </div>
                 <div className="rounded-3xl overflow-hidden shadow-lg ring-1 ring-brand-200/50">
-                  <img src="https://picsum.photos/id/1003/1200/800" alt="Hero" className="w-full h-full object-cover" />
+                  <img src="assets/hero-aym.jpg" alt="AYM Propiedades" className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -380,6 +383,12 @@
 
               <div className="col-span-2 md:col-span-6">
                 <Input placeholder="Buscar por título, comuna, etiqueta…" value={query} onChange={(e) => setQuery(e.target.value)} />
+              </div>
+
+              <div className="md:col-span-6 flex flex-wrap gap-2">
+                <Chip active={op === "venta"} onClick={() => setOp("venta")}>Solo Venta</Chip>
+                <Chip active={op === "arriendo"} onClick={() => setOp("arriendo")}>Solo Arriendo</Chip>
+                <Chip active={op === "todas"} onClick={() => setOp("todas")}>Todas</Chip>
               </div>
             </div>
 
@@ -423,6 +432,7 @@
                     `Hola, soy ${nombre}. Tel: ${telefono}. ${mensaje}`
                   )}`;
                   window.open(url, "_blank");
+                  e.currentTarget.reset();
                 }}
                 className="bg-white rounded-2xl border border-brand-100 p-6 space-y-4 shadow-sm"
               >
