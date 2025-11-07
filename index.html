@@ -3,207 +3,92 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AYM Propiedades</title>
+  <title>AYM Propiedades – Venta y Arriendo</title>
 
-  <!-- Tailwind CDN -->
+  <!-- SEO / Social -->
+  <meta name="description" content="AYM Propiedades: venta y arriendo en la Región de Valparaíso. Publica tu propiedad con nosotros." />
+  <meta property="og:title" content="AYM Propiedades – Venta y Arriendo" />
+  <meta property="og:description" content="Publica y encuentra propiedades: foto de portada, galería y contacto directo." />
+  <meta property="og:type" content="website" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Paleta AYM (dorado/bronce) — puedes ajustar los hex si lo deseas
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            brand: {
-              50:  "#FFF4E6",
-              100: "#FDE9CC",
-              200: "#F7D7A3",
-              300: "#F4C06A", /* claro */
-              400: "#E89D38",
-              500: "#D18A2A", /* principal */
-              600: "#B8721F",
-              700: "#8F5516", /* oscuro */
-              800: "#6B3E12",
-              900: "#3B2109",
-            }
-          },
-          dropShadow: {
-            brand: "0 2px 0 rgba(0,0,0,.18)",
+            brand: {50:"#FFF4E6",100:"#FDE9CC",200:"#F7D7A3",300:"#F4C06A",400:"#E89D38",500:"#D18A2A",600:"#B8721F",700:"#8F5516",800:"#6B3E12",900:"#3B2109"}
           }
         }
       }
     }
   </script>
 
-  <!-- React 18 + ReactDOM UMD -->
+  <!-- React 18 + ReactDOM + Babel (para JSX simple) -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Babel para poder usar JSX en el navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/aym-logo.png" />
 </head>
 <body class="bg-gray-50 text-gray-900">
   <div id="root"></div>
 
   <script type="text/babel">
-    // ======= DATA (edita acá tus propiedades) =======
-    const PROPS = [
-      {
-        id: "AM-001",
-        titulo: "Casa individual 3D/2B – Villa Alemana",
-        operacion: "arriendo",
-        comuna: "Villa Alemana",
-        region: "Valparaíso",
-        precio: 680000,
-        moneda: "CLP",
-        dormitorios: 3, banos: 2, estacionamientos: 1,
-        terreno_m2: 250, construidos_m2: 95,
-        destacado: true,
-        etiquetas: ["Cercano a Metro", "Patio", "Bodega"],
-        descripcion: "Casa luminosa en pasaje tranquilo. Cocina cerrada, living-comedor, patio y estacionamiento para 1 vehículo.",
-        imagenes: [
-          "https://picsum.photos/id/1018/1200/800",
-          "https://picsum.photos/id/1025/1200/800",
-          "https://picsum.photos/id/1043/1200/800",
-        ],
-        whatsapp: "+56912345678",
-        contactoEmail: "contacto@alarconymatus.cl",
-      },
-      {
-        id: "AM-002",
-        titulo: "Departamento 2D/1B – Quilpué Centro",
-        operacion: "venta",
-        comuna: "Quilpué", region: "Valparaíso",
-        precio: 78900000, moneda: "CLP",
-        dormitorios: 2, banos: 1, estacionamientos: 0,
-        terreno_m2: null, construidos_m2: 56,
-        destacado: false,
-        etiquetas: ["Locación céntrica","Bajas GGCC"],
-        descripcion: "A pasos de comercio, locomoción y servicios. Ideal para primera vivienda o inversión.",
-        imagenes: [
-          "https://picsum.photos/id/1067/1200/800",
-          "https://picsum.photos/id/1060/1200/800",
-        ],
-        whatsapp: "+56912345678",
-        contactoEmail: "contacto@alarconymatus.cl",
-      },
-      {
-        id: "AM-003",
-        titulo: "Parcela 5000 m² – Sector Los Pinos",
-        operacion: "venta",
-        comuna: "Quilpué", region: "Valparaíso",
-        precio: 39900000, moneda: "CLP",
-        dormitorios: 0, banos: 0, estacionamientos: 0,
-        terreno_m2: 5000, construidos_m2: 0,
-        destacado: true,
-        etiquetas: ["Factibilidad eléctrica","Agua en gestión"],
-        descripcion: "Terreno plano con excelente conectividad. Ideal para proyecto familiar o inversión.",
-        imagenes: [
-          "https://picsum.photos/id/1040/1200/800",
-          "https://picsum.photos/id/1039/1200/800",
-        ],
-        whatsapp: "+56912345678",
-        contactoEmail: "contacto@alarconymatus.cl",
-      },
-    ];
+    // ====== CONTACTO GLOBAL ======
+    const CONTACT = {
+      email: "alarconymatus@gmail.com",
+      whatsappMain: "+56990003574",
+      whatsappAlt: "+56996825523",
+      fb: "https://facebook.com/AYM-Propiedades", // puedes ajustar
+      ig: "https://instagram.com/alarconymatus.propiedades"
+    };
 
-    // ======= UI Helpers =======
-    const currency = (v, cur = "CLP") =>
-      new Intl.NumberFormat("es-CL", { style: "currency", currency: cur }).format(v);
+    // ====== HELPERS ======
+    const clp = (n) => new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP"}).format(n);
+    const Badge = ({children}) => <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium text-gray-700 border-gray-200 bg-gray-50">{children}</span>;
 
-    const Badge = ({ children }) => (
-      <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium text-gray-700 border-gray-200 bg-gray-50">
-        {children}
-      </span>
-    );
-
-    const Chip = ({ active, children, onClick }) => (
-      <button
-        onClick={onClick}
-        className={`rounded-full px-3 py-1 text-sm border transition ${
-          active ? "bg-brand-600 text-white border-brand-700" : "bg-white border-gray-300 hover:bg-brand-50"
-        }`}
-      >
-        {children}
-      </button>
-    );
-
-    const Input = (props) => (
-      <input
-        {...props}
-        className={`w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 ${props.className||""}`}
-      />
-    );
-
-    const Select = (props) => (
-      <select
-        {...props}
-        className={`w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 ${props.className||""}`}
-      />
-    );
-
-    const Section = ({ id, title, subtitle, children }) => (
-      <section id={id} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <header className="mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{title}</h2>
-          {subtitle && <p className="text-gray-600 mt-2">{subtitle}</p>}
-        </header>
-        {children}
-      </section>
-    );
-
-    // ======= Components =======
-    function PropertyCard({ p, onOpen }) {
-      return (
-        <div className="group rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition bg-white">
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <img src={p.imagenes?.[0]} alt={p.titulo} className="h-full w-full object-cover group-hover:scale-105 transition" />
-            {p.destacado && (
-              <div className="absolute top-3 left-3 bg-brand-700/90 text-white text-xs px-2 py-1 rounded-full">Destacado</div>
-            )}
+    // ====== TARJETA ======
+    const Card = ({p, onOpen}) => (
+      <div className="group rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm hover:shadow-md transition">
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <img src={p.portada} alt={p.titulo} className="h-full w-full object-cover group-hover:scale-105 transition" />
+          {p.destacado && <div className="absolute top-3 left-3 bg-brand-700/90 text-white text-xs px-2 py-1 rounded-full">Destacado</div>}
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="font-semibold leading-snug">{p.titulo}</h3>
+            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-brand-50 text-brand-800 border border-brand-200">
+              {p.operacion === "venta" ? "Venta" : "Arriendo"}
+            </span>
           </div>
-          <div className="p-4 space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <h3 className="font-semibold leading-snug">{p.titulo}</h3>
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-brand-50 text-brand-800 border border-brand-200">
-                {p.operacion === "venta" ? "Venta" : "Arriendo"}
-              </span>
-            </div>
-            <div className="text-lg font-bold text-brand-700">{currency(p.precio, p.moneda)}</div>
-            <p className="text-sm text-gray-600">{p.comuna}, {p.region}</p>
-            <div className="flex flex-wrap gap-2">
-              {p.dormitorios > 0 && <Badge>{p.dormitorios}D</Badge>}
-              {p.banos > 0 && <Badge>{p.banos}B</Badge>}
-              {p.construidos_m2 > 0 && <Badge>{p.construidos_m2} m² const.</Badge>}
-              {p.terreno_m2 > 0 && <Badge>{p.terreno_m2} m² terr.</Badge>}
-            </div>
-            <div className="flex items-center gap-2 pt-1">
-              {p.etiquetas?.slice(0,3).map((e) => <span key={e} className="text-xs text-gray-500">#{e}</span>)}
-            </div>
-            <div className="pt-2 flex gap-2">
-              <a
-                href={`https://wa.me/${p.whatsapp.replace(/[^\\d]/g, "")}?text=${encodeURIComponent(
-                  `Hola, me interesa la propiedad ${p.id} (${p.titulo}). ¿Sigue disponible?`
-                )}`}
-                target="_blank" rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-xl border border-brand-300 text-brand-800 px-3 py-2 text-sm hover:bg-brand-50"
-              >WhatsApp</a>
-              <button
-                onClick={() => onOpen(p)}
-                className="inline-flex items-center justify-center rounded-xl bg-brand-600 text-white px-3 py-2 text-sm hover:bg-brand-700"
-              >Ver ficha</button>
-            </div>
+          <div className="text-lg font-bold text-brand-700">{clp(p.precio)}</div>
+          <p className="text-sm text-gray-600">{p.comuna}, {p.region}</p>
+          <div className="flex flex-wrap gap-2">
+            {p.dormitorios>0 && <Badge>{p.dormitorios}D</Badge>}
+            {p.banos>0 && <Badge>{p.banos}B</Badge>}
+            {p.construidos_m2>0 && <Badge>{p.construidos_m2} m² const.</Badge>}
+            {p.terreno_m2>0 && <Badge>{p.terreno_m2} m² terr.</Badge>}
+          </div>
+          <div className="pt-2 flex gap-2">
+            <a
+              href={`https://wa.me/${CONTACT.whatsappMain.replace(/[^\\d]/g,"")}?text=${encodeURIComponent(`Hola, me interesa la propiedad ${p.id} (${p.titulo}). ¿Sigue disponible?`)}`}
+              target="_blank" rel="noreferrer"
+              className="rounded-xl border border-brand-300 text-brand-800 px-3 py-2 text-sm hover:bg-brand-50">WhatsApp</a>
+            <button onClick={()=>onOpen(p)} className="rounded-xl bg-brand-600 text-white px-3 py-2 text-sm hover:bg-brand-700">Ver ficha</button>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
 
-    function Drawer({ open, onClose, p }) {
-      if (!open || !p) return null;
+    // ====== FICHA (Drawer) ======
+    const Drawer = ({open, onClose, p}) => {
+      if(!open || !p) return null;
+      const fotos = [p.portada, ...(p.galeria||[])];
       return (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/40" onClick={onClose}/>
           <div className="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl flex flex-col">
             <div className="p-4 border-b flex items-center justify-between">
               <h3 className="font-semibold">{p.titulo} <span className="text-gray-400">• {p.id}</span></h3>
@@ -211,91 +96,71 @@
             </div>
             <div className="p-4 overflow-y-auto space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {p.imagenes?.map((src, i) => (
-                  <img key={i} src={src} alt={`${p.titulo} ${i+1}`} className="w-full h-48 object-cover rounded-xl" />
-                ))}
+                {fotos.map((src,i)=>(<img key={i} src={src} alt={`${p.titulo} ${i+1}`} className="w-full h-48 object-cover rounded-xl" />))}
               </div>
               <div className="space-y-2">
-                <div className="text-2xl font-bold text-brand-700">
-                  {currency(p.precio, p.moneda)} {p.operacion === "venta" ? "• Venta" : "• Arriendo"}
-                </div>
+                <div className="text-2xl font-bold text-brand-700">{clp(p.precio)} {p.operacion==="venta"?"• Venta":"• Arriendo"}</div>
                 <div className="text-gray-700">{p.comuna}, {p.region}</div>
                 <p className="text-gray-700 leading-relaxed">{p.descripcion}</p>
                 <div className="flex flex-wrap gap-2 pt-1">
-                  {p.dormitorios > 0 && <Badge>{p.dormitorios} dormitorios</Badge>}
-                  {p.banos > 0 && <Badge>{p.banos} baños</Badge>}
-                  {p.construidos_m2 > 0 && <Badge>{p.construidos_m2} m² construidos</Badge>}
-                  {p.terreno_m2 > 0 && <Badge>{p.terreno_m2} m² terreno</Badge>}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {p.etiquetas?.map((e) => (<Badge key={e}>{e}</Badge>))}
+                  {p.dormitorios>0 && <Badge>{p.dormitorios} dormitorios</Badge>}
+                  {p.banos>0 && <Badge>{p.banos} baños</Badge>}
+                  {p.construidos_m2>0 && <Badge>{p.construidos_m2} m² construidos</Badge>}
+                  {p.terreno_m2>0 && <Badge>{p.terreno_m2} m² terreno</Badge>}
                 </div>
               </div>
               <div className="flex gap-2">
-                <a
-                  href={`mailto:${p.contactoEmail}?subject=${encodeURIComponent(`[Interés ${p.id}] ${p.titulo}`)}&body=${encodeURIComponent(
-                    `Hola, me interesa la propiedad ${p.id} (${p.titulo}).\n\nPor favor, contáctenme para coordinar una visita.\n\nGracias.`
-                  )}`}
-                  className="rounded-xl border px-3 py-2 text-sm hover:bg-gray-50"
-                >Email</a>
-                <a
-                  href={`https://wa.me/${p.whatsapp.replace(/[^\\d]/g, "")}?text=${encodeURIComponent(
-                    `Hola, me interesa la propiedad ${p.id} (${p.titulo}). ¿Sigue disponible?`
-                  )}`}
-                  target="_blank" rel="noreferrer"
-                  className="rounded-xl bg-brand-600 text-white px-3 py-2 text-sm hover:bg-brand-700"
-                >WhatsApp</a>
+                <a href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(`[Interés ${p.id}] ${p.titulo}`)}&body=${encodeURIComponent(`Hola, me interesa la propiedad ${p.id} (${p.titulo}).`)}`
+                } className="rounded-xl border px-3 py-2 text-sm hover:bg-gray-50">Email</a>
+                <a href={`https://wa.me/${CONTACT.whatsappMain.replace(/[^\\d]/g,"")}?text=${encodeURIComponent(`Hola, me interesa la propiedad ${p.id} (${p.titulo}). ¿Sigue disponible?`)}`}
+                   target="_blank" rel="noreferrer" className="rounded-xl bg-brand-600 text-white px-3 py-2 text-sm hover:bg-brand-700">WhatsApp</a>
               </div>
             </div>
           </div>
         </div>
       );
-    }
+    };
 
-    // ======= App =======
-    function App() {
-      const { useMemo, useState } = React;
-      const [query, setQuery] = useState("");
-      const [op, setOp] = useState("todas");
-      const [comuna, setComuna] = useState("todas");
-      const [min, setMin] = useState("");
-      const [max, setMax] = useState("");
-      const [dorms, setDorms] = useState("todas");
-      const [sort, setSort] = useState("recientes");
-      const [open, setOpen] = useState(false);
-      const [selected, setSelected] = useState(null);
+    // ====== APP ======
+    function App(){
+      const {useEffect, useState, useMemo} = React;
+      const [all,setAll]=useState([]);
+      const [loaded,setLoaded]=useState(false);
+      const [q,setQ]=useState(""); const [op,setOp]=useState("todas"); const [comuna,setComuna]=useState("todas");
+      const [min,setMin]=useState(""); const [max,setMax]=useState(""); const [dorms,setDorms]=useState("todas"); const [sort,setSort]=useState("recientes");
+      const [open,setOpen]=useState(false); const [sel,setSel]=useState(null);
 
-      const filtered = useMemo(() => {
-        let data = [...PROPS];
-        if (op !== "todas") data = data.filter((p) => p.operacion === op);
-        if (comuna !== "todas") data = data.filter((p) => p.comuna === comuna);
+      useEffect(()=>{
+        fetch("props.json?cachebust="+Date.now())
+          .then(r=>r.json()).then(data=>{setAll(data); setLoaded(true);})
+          .catch(()=>{setAll([]); setLoaded(true);});
+      },[]);
 
-        const q = query.trim().toLowerCase();
-        if (q) {
-          data = data.filter(
-            (p) =>
-              p.titulo.toLowerCase().includes(q) ||
-              p.comuna.toLowerCase().includes(q) ||
-              p.region.toLowerCase().includes(q) ||
-              p.descripcion.toLowerCase().includes(q) ||
-              p.etiquetas?.some((e) => e.toLowerCase().includes(q))
+      const filtered = useMemo(()=>{
+        let data=[...all];
+        if(op!=="todas") data=data.filter(p=>p.operacion===op);
+        if(comuna!=="todas") data=data.filter(p=>p.comuna===comuna);
+        const query=q.trim().toLowerCase();
+        if(query){
+          data=data.filter(p=>
+            p.titulo.toLowerCase().includes(query) ||
+            p.comuna.toLowerCase().includes(query) ||
+            p.region.toLowerCase().includes(query) ||
+            (p.descripcion||"").toLowerCase().includes(query) ||
+            (p.etiquetas||[]).some(e=>e.toLowerCase().includes(query))
           );
         }
-        const minV = parseInt(min || 0, 10);
-        const maxV = parseInt(max || 0, 10);
-        if (min) data = data.filter((p) => p.precio >= minV);
-        if (max) data = data.filter((p) => p.precio <= maxV);
-        if (dorms !== "todas") data = data.filter((p) => p.dormitorios === Number(dorms));
-
-        switch (sort) {
+        const minV=parseInt(min||0,10), maxV=parseInt(max||0,10);
+        if(min) data=data.filter(p=>p.precio>=minV);
+        if(max) data=data.filter(p=>p.precio<=maxV);
+        if(dorms!=="todas") data=data.filter(p=>p.dormitorios===Number(dorms));
+        switch(sort){
           case "precio_asc": data.sort((a,b)=>a.precio-b.precio); break;
           case "precio_desc": data.sort((a,b)=>b.precio-a.precio); break;
-          default: data.sort((a,b)=> Number(b.destacado)-Number(a.destacado) || String(b.id).localeCompare(String(a.id)));
+          default: data.sort((a,b)=>Number(b.destacado)-Number(a.destacado) || String(b.id).localeCompare(String(a.id)));
         }
         return data;
-      }, [op, comuna, query, min, max, dorms, sort]);
-
-      const openFicha = (p) => { setSelected(p); setOpen(true); };
+      },[all,op,comuna,q,min,max,dorms,sort]);
 
       return (
         <div className="min-h-screen bg-gradient-to-b from-brand-50 to-gray-50">
@@ -303,20 +168,15 @@
           <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-brand-100">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
               <a href="#home" className="flex items-center gap-3">
-                <img src="assets/aym-logo.png" alt="AYM Propiedades" className="h-8 w-auto drop-shadow-brand" />
+                <img src="assets/aym-logo.png" alt="AYM" className="h-8 w-auto" />
                 <span className="font-bold text-lg tracking-tight text-brand-800">AYM Propiedades</span>
               </a>
               <div className="hidden md:flex items-center gap-6 text-sm">
                 <a href="#listados" className="hover:text-brand-700">Listados</a>
                 <a href="#servicios" className="hover:text-brand-700">Servicios</a>
                 <a href="#contacto" className="hover:text-brand-700">Contacto</a>
-                <a
-                  href={`https://wa.me/${PROPS[0].whatsapp.replace(/[^\\d]/g, "")}?text=${encodeURIComponent(
-                    "Hola, quiero publicar mi propiedad / consultar disponibilidad."
-                  )}`}
-                  target="_blank" rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-brand-600 text-white px-3 py-2 hover:bg-brand-700"
-                >WhatsApp</a>
+                <a href={`https://wa.me/${CONTACT.whatsappMain.replace(/[^\\d]/g,"")}?text=${encodeURIComponent("Hola, quiero publicar mi propiedad.")}`}
+                   target="_blank" rel="noreferrer" className="rounded-xl bg-brand-600 text-white px-3 py-2 hover:bg-brand-700">WhatsApp</a>
               </div>
             </div>
           </nav>
@@ -324,7 +184,7 @@
           {/* HERO */}
           <header id="home" className="relative overflow-hidden">
             <div className="absolute inset-0 -z-10">
-              <div className="h-full w-full bg-gradient-to-br from-brand-50 via-white to-brand-100" />
+              <div className="h-full w-full bg-gradient-to-br from-brand-50 via-white to-brand-100"></div>
             </div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -333,16 +193,11 @@
                     AYM Propiedades: <span className="text-brand-600">venta y arriendo</span> con confianza
                   </h1>
                   <p className="text-gray-700 md:text-lg">
-                    Gestión integral en Valparaíso: difusión, selección de inquilinos, contratos y reportes al propietario.
+                    Administra tus publicaciones: portada, galería y contacto directo.
                   </p>
                   <div className="flex gap-3">
                     <a href="#listados" className="rounded-xl bg-brand-600 text-white px-4 py-2 text-sm md:text-base hover:bg-brand-700">Ver propiedades</a>
                     <a href="#contacto" className="rounded-xl border border-brand-300 text-brand-800 px-4 py-2 text-sm md:text-base hover:bg-brand-50">Publica la tuya</a>
-                  </div>
-                  <div className="flex items-center gap-4 pt-2 text-sm text-brand-800">
-                    <span>✓ Filtros de inquilinos</span>
-                    <span>✓ Contratos y seguimiento</span>
-                    <span>✓ Fotos y difusión</span>
                   </div>
                 </div>
                 <div className="rounded-3xl overflow-hidden shadow-lg ring-1 ring-brand-200/50">
@@ -352,132 +207,108 @@
             </div>
           </header>
 
-          {/* BUSCADOR + LISTADOS */}
-          <Section id="listados" title="Propiedades disponibles" subtitle="Filtra por operación, comuna, precio y dormitorios.">
+          {/* FILTROS + LISTADOS */}
+          <section id="listados" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <header className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold">Propiedades disponibles</h2>
+              <p className="text-gray-600 mt-2">Filtra por operación, comuna, precio y dormitorios.</p>
+            </header>
+
+            {/* Filtros */}
             <div className="grid grid-cols-2 md:grid-cols-6 gap-3 bg-white p-4 rounded-2xl border border-brand-100">
-              <Select value={op} onChange={(e) => setOp(e.target.value)}>
-                <option value="todas">Todas</option>
-                <option value="venta">Venta</option>
-                <option value="arriendo">Arriendo</option>
-              </Select>
-
-              <Select value={comuna} onChange={(e) => setComuna(e.target.value)}>
-                {["todas", ...Array.from(new Set(PROPS.map((p) => p.comuna)))].map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </Select>
-
-              <Input placeholder="Mín $" inputMode="numeric" value={min} onChange={(e) => setMin(e.target.value)} />
-              <Input placeholder="Máx $" inputMode="numeric" value={max} onChange={(e) => setMax(e.target.value)} />
-
-              <Select value={dorms} onChange={(e) => setDorms(e.target.value)}>
-                <option value="todas">Dormitorios</option>
-                {[0,1,2,3,4,5].map((n) => (<option value={String(n)} key={n}>{n}</option>))}
-              </Select>
-
-              <Select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <select className="w-full rounded-xl border px-3 py-2 text-sm" value={op} onChange={e=>setOp(e.target.value)}>
+                <option value="todas">Todas</option><option value="venta">Venta</option><option value="arriendo">Arriendo</option>
+              </select>
+              <select className="w-full rounded-xl border px-3 py-2 text-sm" value={comuna} onChange={e=>setComuna(e.target.value)}>
+                {["todas", ...Array.from(new Set(all.map(p=>p.comuna)))].map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+              <input className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Mín $" inputMode="numeric" value={min} onChange={e=>setMin(e.target.value)} />
+              <input className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Máx $" inputMode="numeric" value={max} onChange={e=>setMax(e.target.value)} />
+              <select className="w-full rounded-xl border px-3 py-2 text-sm" value={dorms} onChange={e=>setDorms(e.target.value)}>
+                <option value="todas">Dormitorios</option>{[0,1,2,3,4,5].map(n=><option key={n} value={n}>{n}</option>)}
+              </select>
+              <select className="w-full rounded-xl border px-3 py-2 text-sm" value={sort} onChange={e=>setSort(e.target.value)}>
                 <option value="recientes">Recientes / Destacados</option>
                 <option value="precio_asc">Precio: menor a mayor</option>
                 <option value="precio_desc">Precio: mayor a menor</option>
-              </Select>
+              </select>
 
               <div className="col-span-2 md:col-span-6">
-                <Input placeholder="Buscar por título, comuna, etiqueta…" value={query} onChange={(e) => setQuery(e.target.value)} />
-              </div>
-
-              <div className="md:col-span-6 flex flex-wrap gap-2">
-                <Chip active={op === "venta"} onClick={() => setOp("venta")}>Solo Venta</Chip>
-                <Chip active={op === "arriendo"} onClick={() => setOp("arriendo")}>Solo Arriendo</Chip>
-                <Chip active={op === "todas"} onClick={() => setOp("todas")}>Todas</Chip>
+                <input className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Buscar por título, comuna, etiqueta…"
+                       value={q} onChange={e=>setQ(e.target.value)} />
               </div>
             </div>
 
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((p) => (<PropertyCard key={p.id} p={p} onOpen={(x)=>{setSelected(x); setOpen(true);}} />))}
-              {filtered.length === 0 && (
-                <div className="col-span-full text-center text-gray-500 py-12 border rounded-2xl bg-white">
-                  No se encontraron propiedades con esos filtros.
-                </div>
-              )}
-            </div>
-          </Section>
+            {/* Grid */}
+            {!loaded ? (
+              <div className="mt-8 text-gray-500">Cargando…</div>
+            ) : (
+              <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map(p=><Card key={p.id} p={p} onOpen={(x)=>{setSel(x); setOpen(true);}} />)}
+                {filtered.length===0 && <div className="col-span-full text-center text-gray-500 py-12 border rounded-2xl bg-white">No hay resultados.</div>}
+              </div>
+            )}
+          </section>
 
           {/* SERVICIOS */}
-          <Section id="servicios" title="Servicios para propietarios" subtitle="Nos encargamos de punta a punta para que no te preocupes de nada.">
+          <section id="servicios" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <header className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold">Servicios para propietarios</h2>
+              <p className="text-gray-600 mt-2">Publicación, selección de inquilinos, contratos y seguimiento.</p>
+            </header>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { t: "Publicación y Difusión", d: "Fotos, video, copywriting y publicación en portales y redes." },
-                { t: "Selección de Inquilinos", d: "Pre-evaluación, verificación de antecedentes y scoring." },
-                { t: "Gestión de Contratos", d: "Borradores, firmas y renovación o término." },
-              ].map((s) => (
+                {t:"Publicación y Difusión",d:"Fotografía, descripción y promoción en redes."},
+                {t:"Selección de Inquilinos",d:"Pre-evaluación y verificación de respaldo."},
+                {t:"Gestión de Contratos",d:"Borradores, firmas, renovación o término."},
+              ].map(s=>(
                 <div key={s.t} className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold mb-2 text-brand-900">{s.t}</h3>
-                  <p className="text-gray-700 text-sm leading-relaxed">{s.d}</p>
+                  <h3 className="font-semibold mb-2">{s.t}</h3><p className="text-sm text-gray-700">{s.d}</p>
                 </div>
               ))}
             </div>
-          </Section>
+          </section>
 
           {/* CONTACTO */}
-          <Section id="contacto" title="Contacto" subtitle="Cuéntanos tu necesidad o publica tu propiedad.">
+          <section id="contacto" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <header className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold">Contacto</h2>
+              <p className="text-gray-600 mt-2">Cuéntanos tu necesidad o publica tu propiedad.</p>
+            </header>
             <div className="grid md:grid-cols-2 gap-8">
-              <form
-                onSubmit={(e) => {
+              <form onSubmit={(e)=>{
                   e.preventDefault();
-                  const f = new FormData(e.currentTarget);
-                  const nombre = f.get("nombre");
-                  const telefono = f.get("telefono");
-                  const mensaje = f.get("mensaje");
-                  const url = `https://wa.me/${PROPS[0].whatsapp.replace(/[^\\d]/g, "")}?text=${encodeURIComponent(
-                    `Hola, soy ${nombre}. Tel: ${telefono}. ${mensaje}`
-                  )}`;
-                  window.open(url, "_blank");
+                  const f=new FormData(e.currentTarget);
+                  const nombre=f.get("nombre"), tel=f.get("telefono"), msg=f.get("mensaje");
+                  window.open(`https://wa.me/${CONTACT.whatsappMain.replace(/[^\\d]/g,"")}?text=${encodeURIComponent(`Hola, soy ${nombre}. Tel: ${tel}. ${msg}`)}`,"_blank");
                   e.currentTarget.reset();
-                }}
-                className="bg-white rounded-2xl border border-brand-100 p-6 space-y-4 shadow-sm"
-              >
+                }} className="bg-white rounded-2xl border border-brand-100 p-6 space-y-4 shadow-sm">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm">Nombre</label>
-                    <Input name="nombre" required placeholder="Tu nombre" />
-                  </div>
-                  <div>
-                    <label className="text-sm">Teléfono</label>
-                    <Input name="telefono" required placeholder="+56 9 ..." />
-                  </div>
+                  <div><label className="text-sm">Nombre</label><input name="nombre" required className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="Tu nombre"/></div>
+                  <div><label className="text-sm">Teléfono</label><input name="telefono" required className="w-full rounded-xl border px-3 py-2 text-sm" placeholder="+56 9 ..."/></div>
                 </div>
                 <div>
                   <label className="text-sm">Mensaje</label>
-                  <textarea name="mensaje" required placeholder="Quiero publicar mi casa / consultar por AM-001"
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 min-h-[120px]"></textarea>
+                  <textarea name="mensaje" required className="w-full rounded-xl border px-3 py-2 text-sm min-h-[120px]" placeholder="Quiero publicar mi propiedad / consultar disponibilidad"></textarea>
                 </div>
                 <div className="flex gap-3">
-                  <button type="submit" className="rounded-xl bg-brand-600 text-white px-4 py-2 text-sm hover:bg-brand-700">
-                    Enviar por WhatsApp
-                  </button>
-                  <a href={`mailto:${PROPS[0].contactoEmail}?subject=${encodeURIComponent("Consulta desde el sitio web")}`}
-                    className="rounded-xl border border-brand-300 text-brand-800 px-4 py-2 text-sm hover:bg-brand-50">Enviar por Email</a>
+                  <button className="rounded-xl bg-brand-600 text-white px-4 py-2 text-sm hover:bg-brand-700" type="submit">Enviar por WhatsApp</button>
+                  <a className="rounded-xl border border-brand-300 text-brand-800 px-4 py-2 text-sm hover:bg-brand-50"
+                     href={`mailto:${CONTACT.email}?subject=${encodeURIComponent("Consulta desde el sitio web")}`}>Enviar por Email</a>
                 </div>
               </form>
               <div className="space-y-4">
                 <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold mb-2 text-brand-900">Datos de contacto</h3>
-                  <p className="text-sm text-gray-700">AYM Propiedades</p>
-                  <p className="text-sm text-gray-700">Región de Valparaíso, Chile</p>
-                  <p className="text-sm text-gray-700">WhatsApp: {PROPS[0].whatsapp}</p>
-                  <p className="text-sm text-gray-700">Email: {PROPS[0].contactoEmail}</p>
-                </div>
-                <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold mb-2 text-brand-900">Preguntas frecuentes</h3>
-                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-2">
-                    <li>¿Cómo agrego una propiedad? Edita el arreglo <code>PROPS</code> al inicio.</li>
-                    <li>¿Puedo usar dominio propio? Sí, con GitHub Pages, Netlify o Vercel.</li>
-                    <li>¿Puedo mostrar solo ventas o arriendos? Usa el filtro de operación.</li>
-                  </ul>
+                  <h3 className="font-semibold mb-2">Datos de contacto</h3>
+                  <p className="text-sm">Email: <a className="underline" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></p>
+                  <p className="text-sm">WhatsApp principal: {CONTACT.whatsappMain}</p>
+                  <p className="text-sm">WhatsApp alternativo: {CONTACT.whatsappAlt}</p>
+                  <p className="text-sm">Facebook: <a className="underline" href={CONTACT.fb} target="_blank" rel="noreferrer">AYM Propiedades</a></p>
+                  <p className="text-sm">Instagram: <a className="underline" href={CONTACT.ig} target="_blank" rel="noreferrer">@alarconymatus.propiedades</a></p>
                 </div>
               </div>
             </div>
-          </Section>
+          </section>
 
           {/* FOOTER */}
           <footer className="border-t">
@@ -494,12 +325,15 @@
             </div>
           </footer>
 
-          {open && <Drawer open={open} onClose={() => setOpen(false)} p={selected} />}
+          {open && <Drawer open={open} onClose={()=>setOpen(false)} p={sel} />}
+          <Drawer open={open} onClose={()=>setOpen(false)} p={sel} />
         </div>
       );
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
   </script>
 </body>
+</html>
+
 </html>
