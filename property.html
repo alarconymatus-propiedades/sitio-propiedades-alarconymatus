@@ -1,0 +1,74 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Propiedad — AYM Propiedades</title>
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container">
+    <a href="./" class="small">← Volver a propiedades</a>
+    <section id="prop" class="section"></section>
+    <section class="section">
+      <h3>Galería</h3>
+      <div id="gal" class="gallery"></div>
+    </section>
+  </main>
+  <div id="footer"></div>
+
+  <script src="./assets/script.js"></script>
+  <script>
+    document.getElementById('header').innerHTML = AYMPages.renderHeader();
+    document.getElementById('footer').innerHTML = AYMPages.renderFooter();
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+
+    function detailHtml(p){
+      const price = p.priceCLP ? AYMPages.fmtCLP(p.priceCLP) : (p.priceUF? \`UF \${p.priceUF}\` : "");
+      return \`
+      <div class="row">
+        <div class="col">
+          <h1 style="margin-top:0">\${p.title}</h1>
+          <div class="badges">
+            \${p.operation? \`<span class="badge">\${p.operation}</span>\`:""}
+            \${p.type? \`<span class="badge">\${p.type}</span>\`:""}
+            \${p.commune? \`<span class="badge">\${p.commune}</span>\`:""}
+            \${p.status? \`<span class="badge">\${p.status}</span>\`:""}
+          </div>
+          <p class="price">\${price}</p>
+          <p>\${p.description||p.summary||""}</p>
+          <table>
+            <tbody>
+              \${(p.bedrooms||p.bathrooms)? \`<tr><th>Programa</th><td>\${p.bedrooms||'-'}D • \${p.bathrooms||'-'}B</td></tr>\`:""}
+              \${p.surface? \`<tr><th>Superficie</th><td>\${p.surface} m²</td></tr>\`:""}
+              \${p.expenses? \`<tr><th>Gastos comunes</th><td>\${p.expenses}</td></tr>\`:""}
+              \${p.parking? \`<tr><th>Estacionamiento</th><td>\${p.parking}</td></tr>\`:""}
+              \${p.address? \`<tr><th>Dirección</th><td>\${p.address}</td></tr>\`:""}
+            </tbody>
+          </table>
+          <hr>
+          <div><strong>Contacto</strong></div>
+          <div class="small">Fanny Matus • <a href="mailto:alarconymatus@gmail.com">alarconymatus@gmail.com</a> • +56 9 9000 3574 • +56 9 9682 5523</div>
+          <div style="margin-top:10px"><a class="button" href="mailto:alarconymatus@gmail.com?subject=Consulta%20por%20\${encodeURIComponent(p.title)}">Consultar esta propiedad</a></div>
+        </div>
+        <div class="col">
+          <img src="\${p.cover || 'https://picsum.photos/800/600?random='+encodeURIComponent(p.id)}" alt="\${p.title}" style="width:100%;height:auto;border-radius:12px;object-fit:cover;background:#e5e7eb">
+        </div>
+      </div>\`;
+    }
+
+    AYMPages.loadProps().then(props => {
+      const p = props.find(x => String(x.id)===String(id));
+      if(!p){ document.querySelector('#prop').innerHTML = '<p>No se encontró la propiedad.</p>'; return; }
+      document.querySelector('#prop').innerHTML = detailHtml(p);
+      const gal = document.querySelector('#gal');
+      const imgs = (p.images && p.images.length ? p.images : [p.cover]).filter(Boolean);
+      gal.innerHTML = imgs.map(src => \`<a href="\${src}" target="_blank" rel="noopener"><img src="\${src}" alt=""></a>\`).join('');
+    });
+  </script>
+</body>
+</html>
