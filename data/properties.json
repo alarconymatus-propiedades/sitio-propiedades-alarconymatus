@@ -23,26 +23,26 @@
     ]
   },
   {
-    "id": "venta-departamento-vina",
-    "title": "Vendo Departamento en Viña del Mar – UF 3.200",
-    "operation": "Venta",
+    "id": "AM-001",
+    "title": "Arriendo Departamento en Villa Alemana – Sector Hipódromo $300.000",
+    "operation": "Arriendo",
     "type": "Departamento",
-    "commune": "Viña del Mar",
+    "commune": "Villa Alemana",
     "status": "Disponible",
-    "priceUF": 3200,
-    "summary": "2D/1B, 70 m², año 1985. Calle Arlegui. Conserjería, citófono. GC $60.000.",
+    "priceCLP": 300000,
+    "summary": "3Dorm/1Baño, 57 m².",
     "description": "Se vende amoblado o sin muebles. Estacionamiento opcional $40.000/mes. Living comedor con terraza, piso flotante, cocina tradicional equipada.",
-    "bedrooms": 2,
+    "bedrooms": 3,
     "bathrooms": 1,
-    "surface": 70,
-    "expenses": "$60.000 aprox.",
-    "parking": "Opcional $40.000/mes",
-    "address": "Calle Arlegui, Viña del Mar",
-    "cover": "https://images.unsplash.com/photo-1505692794403-34d4982fb4ac?q=80&w=1200&auto=format&fit=crop",
+    "surface": 57,
+    "expenses": "Incluye gasto común y aseo domiciliario.",
+    "parking": "Si",
+    "address": "Condominio Don Daniel II, Pasaje Los Narcisos – Sector Hipódromo, Villa Alemana.",
+    "cover": "https://github.com/alarconymatus-propiedades/sitio-propiedades-alarconymatus/blob/main/fotos/AM-001/1.jpg?raw=true",
     "images": [
-      "https://images.unsplash.com/photo-1505692794403-34d4982fb4ac?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1560185008-b033106af2ca?q=80&w=1200&auto=format&fit=crop"
+      "https://github.com/alarconymatus-propiedades/sitio-propiedades-alarconymatus/blob/main/fotos/AM-001/2.jpg?raw=true",
+      "https://github.com/alarconymatus-propiedades/sitio-propiedades-alarconymatus/blob/main/fotos/AM-001/3.jpg?raw=true",
+      "https://github.com/alarconymatus-propiedades/sitio-propiedades-alarconymatus/blob/main/fotos/AM-001/4.jpg?raw=true"
     ]
   }
 ]
