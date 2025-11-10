@@ -1,0 +1,48 @@
+[
+  {
+    "id": "arriendo-departamento-villa-alemana",
+    "title": "Arriendo Departamento en Villa Alemana – Sector Hipódromo",
+    "operation": "Arriendo",
+    "type": "Departamento",
+    "commune": "Villa Alemana",
+    "status": "Disponible",
+    "priceCLP": 300000,
+    "summary": "2D/1B, 70 m² aprox., cocina tradicional, instalación lavadora. Sector Hipódromo.",
+    "description": "Canon $300.000. Living comedor con salida a terraza, cocina tradicional amoblada/equipada, piso flotante, instalación para lavadora. Estacionamiento opcional. Excelente conectividad.",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "surface": 70,
+    "expenses": "—",
+    "parking": "Opcional",
+    "address": "Villa Alemana, Sector Hipódromo",
+    "cover": "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1200&auto=format&fit=crop",
+    "images": [
+      "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1200&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": "venta-departamento-vina",
+    "title": "Vendo Departamento en Viña del Mar – UF 3.200",
+    "operation": "Venta",
+    "type": "Departamento",
+    "commune": "Viña del Mar",
+    "status": "Disponible",
+    "priceUF": 3200,
+    "summary": "2D/1B, 70 m², año 1985. Calle Arlegui. Conserjería, citófono. GC $60.000.",
+    "description": "Se vende amoblado o sin muebles. Estacionamiento opcional $40.000/mes. Living comedor con terraza, piso flotante, cocina tradicional equipada.",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "surface": 70,
+    "expenses": "$60.000 aprox.",
+    "parking": "Opcional $40.000/mes",
+    "address": "Calle Arlegui, Viña del Mar",
+    "cover": "https://images.unsplash.com/photo-1505692794403-34d4982fb4ac?q=80&w=1200&auto=format&fit=crop",
+    "images": [
+      "https://images.unsplash.com/photo-1505692794403-34d4982fb4ac?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1560185008-b033106af2ca?q=80&w=1200&auto=format&fit=crop"
+    ]
+  }
+]
