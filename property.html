@@ -7,55 +7,37 @@
   <meta name="description" content="Detalle de propiedad y galería de fotos - AYM Propiedades" />
   <style>
     :root{
-      --brand:#c7801e; /* dorado del logo */
-      --ink:#0f172a;
-      --muted:#64748b;
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --ring:#e2e8f0;
-      --radius:16px;
+      --brand:#c7801e; --ink:#0f172a; --muted:#64748b;
+      --bg:#f8fafc; --card:#ffffff; --ring:#e2e8f0; --radius:16px;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--ink); background:var(--bg);
-    }
-    .wrap{max-width:1080px; margin:32px auto; padding:0 16px}
-    .back{display:inline-flex; gap:8px; align-items:center; text-decoration:none; color:var(--muted); margin-bottom:16px}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
+      color:var(--ink);background:var(--bg)}
+    .wrap{max-width:1080px;margin:32px auto;padding:0 16px}
+    .back{display:inline-flex;gap:8px;align-items:center;text-decoration:none;color:var(--muted);margin-bottom:16px}
     .back:hover{color:var(--ink)}
-    .card{
-      background:var(--card); border:1px solid var(--ring); border-radius:var(--radius);
-      padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04);
-    }
-    h1{font-size:28px; margin:8px 0 12px}
-    .meta{display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 12px}
-    .tag{font-size:12px; padding:4px 10px; border-radius:999px; background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0}
-    .price{font-weight:700; color:var(--brand)}
-    .grid{
-      display:grid; gap:14px; margin-top:14px;
-      grid-template-columns: repeat(1, minmax(0,1fr));
-    }
-    @media(min-width:720px){ .grid{ grid-template-columns: 2fr 3fr } }
-    .cover{
-      width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:12px; border:1px solid var(--ring);
-      background:#fff;
-    }
-    .desc{white-space:pre-wrap; line-height:1.6; color:#0f172a}
-    .section-title{font-weight:700; margin:24px 0 10px}
-    .gallery{
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;
-    }
-    .gallery a{display:block; border-radius:12px; overflow:hidden; border:1px solid var(--ring); background:#fff}
-    .gallery img{width:100%; height:220px; object-fit:cover; display:block}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:var(--radius);padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    h1{font-size:28px;margin:8px 0 12px}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+    .tag{font-size:12px;padding:4px 10px;border-radius:999px;background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0}
+    .price{font-weight:700;color:var(--brand)}
+    .grid{display:grid;gap:14px;margin-top:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
+    @media(min-width:720px){.grid{grid-template-columns:2fr 3fr}}
+    .cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--ring);background:#fff}
+    .desc{white-space:pre-wrap;line-height:1.6}
+    .section-title{font-weight:700;margin:24px 0 10px}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .gallery a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--ring);background:#fff}
+    .gallery img{width:100%;height:220px;object-fit:cover;display:block}
     .muted{color:var(--muted)}
-    .error{padding:14px; border-radius:12px; border:1px solid #fecaca; background:#fff1f2; color:#7f1d1d}
-    .skeleton{background:linear-gradient(90deg,#f1f5f9, #e2e8f0, #f1f5f9); background-size:200% 100%; animation:sh 1.2s infinite}
+    .error{padding:14px;border-radius:12px;border:1px solid #fecaca;background:#fff1f2;color:#7f1d1d}
+    .skeleton{background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sh 1.2s infinite}
     @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <a class="back" href="index.html" aria-label="Volver a propiedades">← Volver a propiedades</a>
+    <a class="back" href="index.html">← Volver a propiedades</a>
 
     <div id="state" class="muted" style="margin:8px 0 16px;">Cargando propiedad…</div>
 
@@ -89,107 +71,111 @@
     </div>
   </div>
 
-  <script defer>
+  <script>
     (function(){
-      const qs = new URLSearchParams(location.search);
-      const id = qs.get('id');
-
-      const $ = sel => document.querySelector(sel);
+      const $ = s => document.querySelector(s);
       const state = $('#state');
       const content = $('#content');
 
-      function formatCLP(num){
-        try{ return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(num); }
-        catch{ return '$' + (num||0).toLocaleString('es-CL'); }
-      }
-      function formatUF(uf){
-        return 'UF ' + (uf||0).toLocaleString('es-CL',{maximumFractionDigits:2});
-      }
-      function ensureArray(a){ return Array.isArray(a) ? a : (a ? [a] : []); }
+      function getId(){
+        const q = new URLSearchParams(location.search);
+        const urlId = q.get('id');
+        if (urlId) return urlId;
 
-      async function load(){
+        // Fallback si el enlace no trae ?id=...
+        const stored = sessionStorage.getItem('lastPropertyId');
+        return stored || null;
+      }
+
+      function formatCLP(n){
+        try{ return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n); }
+        catch{ return '$' + (n||0).toLocaleString('es-CL'); }
+      }
+      function formatUF(uf){ return 'UF ' + (uf||0).toLocaleString('es-CL',{maximumFractionDigits:2}); }
+      const arr = x => Array.isArray(x) ? x : (x ? [x] : []);
+
+      async function run(){
+        const id = getId();
         if(!id){
-          state.className = 'error';
-          state.textContent = 'Falta el parámetro “id” en la URL. Abre este archivo como: property.html?id=AM-001';
+          state.className='error';
+          state.textContent='Falta el “id”. Asegúrate que el link sea property.html?id=AM-001 (o guarda el id en sessionStorage).';
           return;
         }
+
         try{
-          // Usa ruta absoluta desde la raíz del sitio para evitar problemas de nivel de carpeta
+          // Ruta absoluta a tu JSON en la raíz del sitio
           const res = await fetch('/data/properties.json', {cache:'no-store'});
           if(!res.ok) throw new Error('No se pudo leer /data/properties.json ('+res.status+')');
           const list = await res.json();
 
-          const prop = list.find(p => String(p.id) === String(id));
-          if(!prop){
-            state.className = 'error';
-            state.textContent = 'Propiedad no encontrada: ' + id;
+          const p = list.find(x => String(x.id) === String(id));
+          if(!p){
+            state.className='error';
+            state.textContent='Propiedad no encontrada: '+id;
             return;
           }
 
-          // ---- RENDER ----
-          document.title = prop.title + ' — AYM Propiedades';
-          $('#title').textContent = prop.title;
-          $('#op').textContent = prop.operation || '—';
-          $('#tipo').textContent = prop.type || '—';
-          $('#comuna').textContent = prop.commune || '—';
-          $('#status').textContent = prop.status || '—';
-          $('#precio').textContent =
-            prop.priceUF ? formatUF(prop.priceUF) :
-            (prop.priceCLP ? formatCLP(prop.priceCLP) : '—');
+          // Título y metadatos
+          document.title = p.title + ' — AYM Propiedades';
+          $('#title').textContent = p.title || '';
+          $('#op').textContent = p.operation || '—';
+          $('#tipo').textContent = p.type || '—';
+          $('#comuna').textContent = p.commune || '—';
+          $('#status').textContent = p.status || '—';
+          $('#precio').textContent = p.priceUF ? formatUF(p.priceUF) : (p.priceCLP ? formatCLP(p.priceCLP) : '—');
 
-          $('#addr').textContent = prop.address || '';
-          $('#summary').textContent = prop.summary || '';
-          $('#desc').textContent = prop.description || '';
+          $('#addr').textContent = p.address || '';
+          $('#summary').textContent = p.summary || '';
+          $('#desc').textContent = p.description || '';
 
-          // Facts (si hay)
+          // Facts
           const facts = [];
-          if(prop.bedrooms != null) facts.push(`${prop.bedrooms} dormitorio(s)`);
-          if(prop.bathrooms != null) facts.push(`${prop.bathrooms} baño(s)`);
-          if(prop.surface != null) facts.push(`${prop.surface} m² construidos`);
-          if(prop.terrain != null) facts.push(`${prop.terrain} m² de terreno`);
-          if(prop.parking) facts.push(`Estac.: ${prop.parking}`);
-          if(prop.expenses) facts.push(`Gastos: ${prop.expenses}`);
+          if(p.bedrooms!=null) facts.push(`${p.bedrooms} dormitorio(s)`);
+          if(p.bathrooms!=null) facts.push(`${p.bathrooms} baño(s)`);
+          if(p.surface!=null)   facts.push(`${p.surface} m² construidos`);
+          if(p.terrain!=null)   facts.push(`${p.terrain} m² de terreno`);
+          if(p.parking)         facts.push(`Estac.: ${p.parking}`);
+          if(p.expenses)        facts.push(`Gastos: ${p.expenses}`);
           $('#facts').textContent = facts.join(' · ');
 
           // Portada
+          const cover = p.cover || (arr(p.images)[0] || '');
           const coverEl = $('#cover');
-          coverEl.src = prop.cover || '';
+          coverEl.src = cover;
           coverEl.classList.remove('skeleton');
 
-          // Galería (incluir portada si no está)
-          const imgs = ensureArray(prop.images);
-          if(prop.cover && !imgs.includes(prop.cover)) imgs.unshift(prop.cover);
+          // Galería (incluye portada si no viene en images)
+          const images = arr(p.images);
+          if(cover && !images.includes(cover)) images.unshift(cover);
 
           const gal = $('#gallery');
           gal.innerHTML = '';
-          if(imgs.length === 0){
+          if(images.length === 0){
             gal.innerHTML = '<div class="muted">Sin imágenes disponibles.</div>';
-          }else{
-            imgs.forEach(src=>{
+          } else {
+            images.forEach(src => {
               const a = document.createElement('a');
-              a.href = src;
-              a.target = '_blank';
-              a.rel = 'noopener';
+              a.href = src; a.target = '_blank'; a.rel = 'noopener';
               const img = document.createElement('img');
-              img.loading = 'lazy';
-              img.alt = 'Foto de la propiedad';
-              img.src = src;
+              img.loading = 'lazy'; img.alt = 'Foto de la propiedad'; img.src = src;
               a.appendChild(img);
               gal.appendChild(a);
             });
           }
 
-          state.style.display = 'none';
-          content.style.display = '';
+          // Mostrar
+          state.style.display='none';
+          content.style.display='';
         }catch(err){
-          state.className = 'error';
-          state.textContent = 'Error cargando la propiedad: ' + err.message;
+          state.className='error';
+          state.textContent='Error cargando la propiedad: '+err.message;
           console.error(err);
         }
       }
-      load();
+      run();
     })();
   </script>
 </body>
 </html>
+
 
