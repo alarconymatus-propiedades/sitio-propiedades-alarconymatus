@@ -15,7 +15,7 @@
     "expenses": "—",
     "parking": "Opcional",
     "address": "Villa Alemana, Sector Hipódromo",
-    "cover": "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1200&auto=format&fit=crop",
+    "cover": "/fotos/AM-001/2.jpg",
     "images": [
       "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1200&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200&auto=format&fit=crop",
@@ -40,7 +40,7 @@
     "address": "Condominio Don Daniel II, Pasaje Los Narcisos – Sector Hipódromo, Villa Alemana.",
     "cover": "/fotos/AM-001/1.jpg",
     "images": [
-      "fotos/AM-001/2.jpg",
+      "/fotos/AM-001/2.jpg",
       "/fotos/AM-001/3.jpg",
       "/fotos/AM-001/4.jpg"
     ]
