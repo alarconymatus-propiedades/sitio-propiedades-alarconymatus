@@ -40,11 +40,17 @@
     "address": "Condominio Don Daniel II, Pasaje Los Narcisos – Sector Hipódromo, Villa Alemana.",
     "cover": "/fotos/AM-001/1.jpg",
     "images": [
-      "/fotos/AM-001/2.jpg",
-      "/fotos/AM-001/3.jpg",
-      "/fotos/AM-001/4.jpg"
-    ]
-  },
+    "/fotos/AM-001/1.jpg",
+    "/fotos/AM-001/2.jpg",
+    "/fotos/AM-001/3.jpg",
+    "/fotos/AM-001/4.jpg",
+    "/fotos/AM-001/5.jpg",
+    "/fotos/AM-001/6.jpg",
+    "/fotos/AM-001/7.jpg",
+    "/fotos/AM-001/8.jpg",
+    "/fotos/AM-001/9.jpg"
+  ]
+},
   {
     "id": "AM-002",
     "title": "Vendo Casa en Quilpué – $215.000.000",
