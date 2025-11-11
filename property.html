@@ -1,74 +1,195 @@
-
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Propiedad — AYM Propiedades</title>
-  <link rel="stylesheet" href="./assets/style.css">
+  <meta name="description" content="Detalle de propiedad y galería de fotos - AYM Propiedades" />
+  <style>
+    :root{
+      --brand:#c7801e; /* dorado del logo */
+      --ink:#0f172a;
+      --muted:#64748b;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --ring:#e2e8f0;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink); background:var(--bg);
+    }
+    .wrap{max-width:1080px; margin:32px auto; padding:0 16px}
+    .back{display:inline-flex; gap:8px; align-items:center; text-decoration:none; color:var(--muted); margin-bottom:16px}
+    .back:hover{color:var(--ink)}
+    .card{
+      background:var(--card); border:1px solid var(--ring); border-radius:var(--radius);
+      padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04);
+    }
+    h1{font-size:28px; margin:8px 0 12px}
+    .meta{display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 12px}
+    .tag{font-size:12px; padding:4px 10px; border-radius:999px; background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0}
+    .price{font-weight:700; color:var(--brand)}
+    .grid{
+      display:grid; gap:14px; margin-top:14px;
+      grid-template-columns: repeat(1, minmax(0,1fr));
+    }
+    @media(min-width:720px){ .grid{ grid-template-columns: 2fr 3fr } }
+    .cover{
+      width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:12px; border:1px solid var(--ring);
+      background:#fff;
+    }
+    .desc{white-space:pre-wrap; line-height:1.6; color:#0f172a}
+    .section-title{font-weight:700; margin:24px 0 10px}
+    .gallery{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;
+    }
+    .gallery a{display:block; border-radius:12px; overflow:hidden; border:1px solid var(--ring); background:#fff}
+    .gallery img{width:100%; height:220px; object-fit:cover; display:block}
+    .muted{color:var(--muted)}
+    .error{padding:14px; border-radius:12px; border:1px solid #fecaca; background:#fff1f2; color:#7f1d1d}
+    .skeleton{background:linear-gradient(90deg,#f1f5f9, #e2e8f0, #f1f5f9); background-size:200% 100%; animation:sh 1.2s infinite}
+    @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  </style>
 </head>
 <body>
-  <div id="header"></div>
-  <main class="container">
-    <a href="./" class="small">← Volver a propiedades</a>
-    <section id="prop" class="section"></section>
-    <section class="section">
-      <h3>Galería</h3>
-      <div id="gal" class="gallery"></div>
-    </section>
-  </main>
-  <div id="footer"></div>
+  <div class="wrap">
+    <a class="back" href="index.html" aria-label="Volver a propiedades">← Volver a propiedades</a>
 
-  <script src="./assets/script.js"></script>
-  <script>
-    document.getElementById('header').innerHTML = AYMPages.renderHeader();
-    document.getElementById('footer').innerHTML = AYMPages.renderFooter();
+    <div id="state" class="muted" style="margin:8px 0 16px;">Cargando propiedad…</div>
 
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
+    <div id="content" class="card" style="display:none">
+      <h1 id="title">Título</h1>
 
-    function detailHtml(p){
-      const price = p.priceCLP ? AYMPages.fmtCLP(p.priceCLP) : (p.priceUF? \`UF \${p.priceUF}\` : "");
-      return \`
-      <div class="row">
-        <div class="col">
-          <h1 style="margin-top:0">\${p.title}</h1>
-          <div class="badges">
-            \${p.operation? \`<span class="badge">\${p.operation}</span>\`:""}
-            \${p.type? \`<span class="badge">\${p.type}</span>\`:""}
-            \${p.commune? \`<span class="badge">\${p.commune}</span>\`:""}
-            \${p.status? \`<span class="badge">\${p.status}</span>\`:""}
-          </div>
-          <p class="price">\${price}</p>
-          <p>\${p.description||p.summary||""}</p>
-          <table>
-            <tbody>
-              \${(p.bedrooms||p.bathrooms)? \`<tr><th>Programa</th><td>\${p.bedrooms||'-'}D • \${p.bathrooms||'-'}B</td></tr>\`:""}
-              \${p.surface? \`<tr><th>Superficie</th><td>\${p.surface} m²</td></tr>\`:""}
-              \${p.expenses? \`<tr><th>Gastos comunes</th><td>\${p.expenses}</td></tr>\`:""}
-              \${p.parking? \`<tr><th>Estacionamiento</th><td>\${p.parking}</td></tr>\`:""}
-              \${p.address? \`<tr><th>Dirección</th><td>\${p.address}</td></tr>\`:""}
-            </tbody>
-          </table>
-          <hr>
-          <div><strong>Contacto</strong></div>
-          <div class="small">Fanny Matus • <a href="mailto:alarconymatus@gmail.com">alarconymatus@gmail.com</a> • +56 9 9000 3574 • +56 9 9682 5523</div>
-          <div style="margin-top:10px"><a class="button" href="mailto:alarconymatus@gmail.com?subject=Consulta%20por%20\${encodeURIComponent(p.title)}">Consultar esta propiedad</a></div>
+      <div class="meta">
+        <span class="tag" id="op"></span>
+        <span class="tag" id="tipo"></span>
+        <span class="tag" id="comuna"></span>
+        <span class="tag" id="status"></span>
+        <span class="tag price" id="precio"></span>
+      </div>
+
+      <div class="grid">
+        <div>
+          <img id="cover" class="cover skeleton" alt="Portada de la propiedad" />
+          <div class="muted" style="margin-top:8px" id="addr"></div>
         </div>
-        <div class="col">
-          <img src="\${p.cover || 'https://picsum.photos/800/600?random='+encodeURIComponent(p.id)}" alt="\${p.title}" style="width:100%;height:auto;border-radius:12px;object-fit:cover;background:#e5e7eb">
+        <div>
+          <div><strong>Resumen:</strong> <span id="summary"></span></div>
+          <div class="section-title">Descripción</div>
+          <div class="desc" id="desc"></div>
+          <div class="section-title">Características</div>
+          <div class="muted" id="facts"></div>
         </div>
-      </div>\`;
-    }
+      </div>
 
-    AYMPages.loadProps().then(props => {
-      const p = props.find(x => String(x.id)===String(id));
-      if(!p){ document.querySelector('#prop').innerHTML = '<p>No se encontró la propiedad.</p>'; return; }
-      document.querySelector('#prop').innerHTML = detailHtml(p);
-      const gal = document.querySelector('#gal');
-      const imgs = (p.images && p.images.length ? p.images : [p.cover]).filter(Boolean);
-      gal.innerHTML = imgs.map(src => \`<a href="\${src}" target="_blank" rel="noopener"><img src="\${src}" alt=""></a>\`).join('');
-    });
+      <div class="section-title">Galería</div>
+      <div id="gallery" class="gallery"></div>
+    </div>
+  </div>
+
+  <script defer>
+    (function(){
+      const qs = new URLSearchParams(location.search);
+      const id = qs.get('id');
+
+      const $ = sel => document.querySelector(sel);
+      const state = $('#state');
+      const content = $('#content');
+
+      function formatCLP(num){
+        try{ return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(num); }
+        catch{ return '$' + (num||0).toLocaleString('es-CL'); }
+      }
+      function formatUF(uf){
+        return 'UF ' + (uf||0).toLocaleString('es-CL',{maximumFractionDigits:2});
+      }
+      function ensureArray(a){ return Array.isArray(a) ? a : (a ? [a] : []); }
+
+      async function load(){
+        if(!id){
+          state.className = 'error';
+          state.textContent = 'Falta el parámetro “id” en la URL. Abre este archivo como: property.html?id=AM-001';
+          return;
+        }
+        try{
+          // Usa ruta absoluta desde la raíz del sitio para evitar problemas de nivel de carpeta
+          const res = await fetch('/data/properties.json', {cache:'no-store'});
+          if(!res.ok) throw new Error('No se pudo leer /data/properties.json ('+res.status+')');
+          const list = await res.json();
+
+          const prop = list.find(p => String(p.id) === String(id));
+          if(!prop){
+            state.className = 'error';
+            state.textContent = 'Propiedad no encontrada: ' + id;
+            return;
+          }
+
+          // ---- RENDER ----
+          document.title = prop.title + ' — AYM Propiedades';
+          $('#title').textContent = prop.title;
+          $('#op').textContent = prop.operation || '—';
+          $('#tipo').textContent = prop.type || '—';
+          $('#comuna').textContent = prop.commune || '—';
+          $('#status').textContent = prop.status || '—';
+          $('#precio').textContent =
+            prop.priceUF ? formatUF(prop.priceUF) :
+            (prop.priceCLP ? formatCLP(prop.priceCLP) : '—');
+
+          $('#addr').textContent = prop.address || '';
+          $('#summary').textContent = prop.summary || '';
+          $('#desc').textContent = prop.description || '';
+
+          // Facts (si hay)
+          const facts = [];
+          if(prop.bedrooms != null) facts.push(`${prop.bedrooms} dormitorio(s)`);
+          if(prop.bathrooms != null) facts.push(`${prop.bathrooms} baño(s)`);
+          if(prop.surface != null) facts.push(`${prop.surface} m² construidos`);
+          if(prop.terrain != null) facts.push(`${prop.terrain} m² de terreno`);
+          if(prop.parking) facts.push(`Estac.: ${prop.parking}`);
+          if(prop.expenses) facts.push(`Gastos: ${prop.expenses}`);
+          $('#facts').textContent = facts.join(' · ');
+
+          // Portada
+          const coverEl = $('#cover');
+          coverEl.src = prop.cover || '';
+          coverEl.classList.remove('skeleton');
+
+          // Galería (incluir portada si no está)
+          const imgs = ensureArray(prop.images);
+          if(prop.cover && !imgs.includes(prop.cover)) imgs.unshift(prop.cover);
+
+          const gal = $('#gallery');
+          gal.innerHTML = '';
+          if(imgs.length === 0){
+            gal.innerHTML = '<div class="muted">Sin imágenes disponibles.</div>';
+          }else{
+            imgs.forEach(src=>{
+              const a = document.createElement('a');
+              a.href = src;
+              a.target = '_blank';
+              a.rel = 'noopener';
+              const img = document.createElement('img');
+              img.loading = 'lazy';
+              img.alt = 'Foto de la propiedad';
+              img.src = src;
+              a.appendChild(img);
+              gal.appendChild(a);
+            });
+          }
+
+          state.style.display = 'none';
+          content.style.display = '';
+        }catch(err){
+          state.className = 'error';
+          state.textContent = 'Error cargando la propiedad: ' + err.message;
+          console.error(err);
+        }
+      }
+      load();
+    })();
   </script>
 </body>
 </html>
+
