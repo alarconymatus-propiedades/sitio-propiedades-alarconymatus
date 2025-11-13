@@ -11,28 +11,100 @@
       --bg:#f8fafc; --card:#ffffff; --ring:#e2e8f0; --radius:16px;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
-      color:var(--ink);background:var(--bg)}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
+      color:var(--ink);
+      background:var(--bg)
+    }
     .wrap{max-width:1080px;margin:32px auto;padding:0 16px}
-    .back{display:inline-flex;gap:8px;align-items:center;text-decoration:none;color:var(--muted);margin-bottom:16px}
+    .back{
+      display:inline-flex;gap:8px;align-items:center;
+      text-decoration:none;color:var(--muted);margin-bottom:16px
+    }
     .back:hover{color:var(--ink)}
-    .card{background:var(--card);border:1px solid var(--ring);border-radius:var(--radius);padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .card{
+      background:var(--card);border:1px solid var(--ring);
+      border-radius:var(--radius);padding:20px;
+      box-shadow:0 1px 2px rgba(0,0,0,.04)
+    }
     h1{font-size:28px;margin:8px 0 12px}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
-    .tag{font-size:12px;padding:4px 10px;border-radius:999px;background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0}
+    .tag{
+      font-size:12px;padding:4px 10px;border-radius:999px;
+      background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0
+    }
     .price{font-weight:700;color:var(--brand)}
     .grid{display:grid;gap:14px;margin-top:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:720px){.grid{grid-template-columns:2fr 3fr}}
-    .cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--ring);background:#fff}
+    .cover{
+      width:100%;aspect-ratio:16/9;object-fit:cover;
+      border-radius:12px;border:1px solid var(--ring);background:#fff
+    }
     .desc{white-space:pre-wrap;line-height:1.6}
     .section-title{font-weight:700;margin:24px 0 10px}
-    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-    .gallery a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--ring);background:#fff}
-    .gallery img{width:100%;height:220px;object-fit:cover;display:block}
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:12px
+    }
+    .gallery img{
+      width:100%;height:220px;object-fit:cover;display:block;
+      border-radius:12px;border:1px solid var(--ring);background:#fff;
+      cursor:pointer;transition:transform .15s ease,box-shadow .15s ease
+    }
+    .gallery img:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 20px rgba(0,0,0,.18)
+    }
     .muted{color:var(--muted)}
-    .error{padding:14px;border-radius:12px;border:1px solid #fecaca;background:#fff1f2;color:#7f1d1d}
-    .skeleton{background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sh 1.2s infinite}
+    .error{
+      padding:14px;border-radius:12px;border:1px solid #fecaca;
+      background:#fff1f2;color:#7f1d1d
+    }
+    .skeleton{
+      background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);
+      background-size:200% 100%;animation:sh 1.2s infinite
+    }
     @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* ---------- LIGHTBOX ---------- */
+    .lightbox.hidden{display:none}
+    .lightbox{
+      position:fixed;inset:0;z-index:9999;
+      display:flex;align-items:center;justify-content:center
+    }
+    .lightbox-backdrop{
+      position:absolute;inset:0;
+      background:rgba(0,0,0,.75)
+    }
+    .lightbox-image{
+      position:relative;max-width:90vw;max-height:80vh;
+      border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,.6);
+      object-fit:contain;z-index:2;background:#000
+    }
+    .lightbox-btn{
+      position:absolute;z-index:3;
+      border:none;background:rgba(0,0,0,.55);color:#fff;
+      width:40px;height:40px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;cursor:pointer;
+      transition:background .15s ease,transform .1s ease
+    }
+    .lightbox-btn:hover{
+      background:rgba(0,0,0,.8);
+      transform:scale(1.02)
+    }
+    .lightbox-close{top:20px;right:20px;font-size:26px}
+    .lightbox-prev{left:30px;top:50%;transform:translateY(-50%)}
+    .lightbox-next{right:30px;top:50%;transform:translateY(-50%)}
+    .lightbox-counter{
+      position:absolute;bottom:20px;left:50%;
+      transform:translateX(-50%);
+      color:#fff;background:rgba(0,0,0,.55);
+      padding:6px 12px;border-radius:999px;
+      font-size:14px;z-index:3
+    }
   </style>
 </head>
 <body>
@@ -71,28 +143,95 @@
     </div>
   </div>
 
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lightbox hidden">
+    <div class="lightbox-backdrop"></div>
+
+    <button id="lightboxClose" class="lightbox-btn lightbox-close">&times;</button>
+    <button id="lightboxPrev" class="lightbox-btn lightbox-prev">&#10094;</button>
+    <button id="lightboxNext" class="lightbox-btn lightbox-next">&#10095;</button>
+
+    <img id="lightboxImage" class="lightbox-image" src="" alt="Imagen propiedad">
+    <div id="lightboxCounter" class="lightbox-counter"></div>
+  </div>
+
   <script>
     (function(){
       const $ = s => document.querySelector(s);
-      const state = $('#state');
+      const state   = $('#state');
       const content = $('#content');
+
+      // elementos del lightbox
+      const lightbox        = $('#lightbox');
+      const lightboxImg     = $('#lightboxImage');
+      const lightboxCounter = $('#lightboxCounter');
+      const btnClose        = $('#lightboxClose');
+      const btnPrev         = $('#lightboxPrev');
+      const btnNext         = $('#lightboxNext');
+
+      let currentImages = [];
+      let currentIndex  = 0;
 
       function getId(){
         const q = new URLSearchParams(location.search);
         const urlId = q.get('id');
         if (urlId) return urlId;
 
-        // Fallback si el enlace no trae ?id=...
         const stored = sessionStorage.getItem('lastPropertyId');
         return stored || null;
       }
 
       function formatCLP(n){
-        try{ return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n); }
-        catch{ return '$' + (n||0).toLocaleString('es-CL'); }
+        try{
+          return new Intl.NumberFormat('es-CL',{
+            style:'currency',currency:'CLP',maximumFractionDigits:0
+          }).format(n);
+        }catch{
+          return '$' + (n||0).toLocaleString('es-CL');
+        }
       }
-      function formatUF(uf){ return 'UF ' + (uf||0).toLocaleString('es-CL',{maximumFractionDigits:2}); }
+      function formatUF(uf){
+        return 'UF ' + (uf||0).toLocaleString('es-CL',{maximumFractionDigits:2});
+      }
       const arr = x => Array.isArray(x) ? x : (x ? [x] : []);
+
+      function openLightbox(index){
+        if(!currentImages.length) return;
+        currentIndex = index;
+        updateLightboxImage();
+        lightbox.classList.remove('hidden');
+      }
+      function closeLightbox(){
+        lightbox.classList.add('hidden');
+      }
+      function showNext(){
+        if(!currentImages.length) return;
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        updateLightboxImage();
+      }
+      function showPrev(){
+        if(!currentImages.length) return;
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        updateLightboxImage();
+      }
+      function updateLightboxImage(){
+        lightboxImg.src = currentImages[currentIndex];
+        lightboxCounter.textContent = (currentIndex+1) + ' / ' + currentImages.length;
+      }
+
+      // eventos lightbox
+      btnClose.addEventListener('click', closeLightbox);
+      btnNext.addEventListener('click', showNext);
+      btnPrev.addEventListener('click', showPrev);
+      lightbox.addEventListener('click', e=>{
+        if(e.target.classList.contains('lightbox-backdrop')) closeLightbox();
+      });
+      document.addEventListener('keydown', e=>{
+        if(lightbox.classList.contains('hidden')) return;
+        if(e.key === 'Escape')     closeLightbox();
+        if(e.key === 'ArrowRight') showNext();
+        if(e.key === 'ArrowLeft')  showPrev();
+      });
 
       async function run(){
         const id = getId();
@@ -103,8 +242,7 @@
         }
 
         try{
-          // Ruta absoluta a tu JSON en la raíz del sitio
-          const res = await fetch('/data/properties.json', {cache:'no-store'});
+          const res = await fetch('/data/properties.json',{cache:'no-store'});
           if(!res.ok) throw new Error('No se pudo leer /data/properties.json ('+res.status+')');
           const list = await res.json();
 
@@ -117,16 +255,18 @@
 
           // Título y metadatos
           document.title = p.title + ' — AYM Propiedades';
-          $('#title').textContent = p.title || '';
-          $('#op').textContent = p.operation || '—';
-          $('#tipo').textContent = p.type || '—';
-          $('#comuna').textContent = p.commune || '—';
-          $('#status').textContent = p.status || '—';
-          $('#precio').textContent = p.priceUF ? formatUF(p.priceUF) : (p.priceCLP ? formatCLP(p.priceCLP) : '—');
+          $('#title').textContent   = p.title   || '';
+          $('#op').textContent      = p.operation || '—';
+          $('#tipo').textContent    = p.type      || '—';
+          $('#comuna').textContent  = p.commune   || '—';
+          $('#status').textContent  = p.status    || '—';
+          $('#precio').textContent  = p.priceUF
+            ? formatUF(p.priceUF)
+            : (p.priceCLP ? formatCLP(p.priceCLP) : '—');
 
-          $('#addr').textContent = p.address || '';
-          $('#summary').textContent = p.summary || '';
-          $('#desc').textContent = p.description || '';
+          $('#addr').textContent    = p.address     || '';
+          $('#summary').textContent = p.summary     || '';
+          $('#desc').textContent    = p.description || '';
 
           // Facts
           const facts = [];
@@ -139,7 +279,7 @@
           $('#facts').textContent = facts.join(' · ');
 
           // Portada
-          const cover = p.cover || (arr(p.images)[0] || '');
+          const cover   = p.cover || (arr(p.images)[0] || '');
           const coverEl = $('#cover');
           coverEl.src = cover;
           coverEl.classList.remove('skeleton');
@@ -147,23 +287,28 @@
           // Galería (incluye portada si no viene en images)
           const images = arr(p.images);
           if(cover && !images.includes(cover)) images.unshift(cover);
+          currentImages = images;
 
           const gal = $('#gallery');
           gal.innerHTML = '';
-          if(images.length === 0){
+
+          if(!images.length){
             gal.innerHTML = '<div class="muted">Sin imágenes disponibles.</div>';
-          } else {
-            images.forEach(src => {
-              const a = document.createElement('a');
-              a.href = src; a.target = '_blank'; a.rel = 'noopener';
+          }else{
+            images.forEach((src, index) => {
               const img = document.createElement('img');
-              img.loading = 'lazy'; img.alt = 'Foto de la propiedad'; img.src = src;
-              a.appendChild(img);
-              gal.appendChild(a);
+              img.loading = 'lazy';
+              img.alt     = 'Foto de la propiedad';
+              img.src     = src;
+              img.addEventListener('click', () => openLightbox(index));
+              gal.appendChild(img);
             });
+
+            // también puedes abrir lightbox desde la portada
+            coverEl.style.cursor = 'pointer';
+            coverEl.addEventListener('click', () => openLightbox(0));
           }
 
-          // Mostrar
           state.style.display='none';
           content.style.display='';
         }catch(err){
@@ -177,5 +322,6 @@
   </script>
 </body>
 </html>
+
 
 
