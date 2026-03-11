@@ -1,4 +1,35 @@
 [
+{
+  "id": "AM-013",
+  "title": "Arriendo Local Comercial en Quilpué – $650.000",
+  "operation": "Arriendo",
+  "type": "Local Comercial",
+  "commune": "Quilpué",
+  "status": "Disponible",
+  "priceCLP": 650000,
+  "summary": "Local comercial de 45 m² habilitado para carnicería, equipado y listo para funcionar. Excelente ubicación en calle Los Nardos.",
+  "description": "ARRIENDO LOCAL COMERCIAL – QUILPUÉ – $650.000\nPagina web: alarconymatuspropiedades.cl\n\nSe arrienda local comercial ubicado en calle Los Nardos, cerca de la avenida principal de Marga Marga, en Quilpué. Excelente ubicación comercial.\n\nEl local se encuentra habilitado para funcionamiento de carnicería y cuenta con todo el equipamiento necesario, además de cumplir con las normativas sanitarias correspondientes.\n\nCaracterísticas del local:\n\n* Superficie aproximada: 45 m²\n* Refrigeradores grandes\n* Vitrina refrigerada\n* Mesón de trabajo\n* Cortadora de carne\n* Moledora\n* Sala de desposte\n* Baño\n* Protecciones metálicas\n* Portón metálico de seguridad\n\nLocal bien ubicado y listo para funcionar.\n\nCanon de arriendo: $650.000\n\nRequisitos:\n\n* Demostrar ingresos aproximados de $1.800.000\n* Presentar documentación correspondiente\n* Considerar mes de arriendo, mes de garantía y comisión de corretaje\n\nContacto:\n+56 9 9000 3574\n+56 9 9682 5523\n\nMás información en nuestras redes sociales:\nFacebook: Busca AYM Propiedades\nInstagram: @alarconymatus.propiedades",
+  "bathrooms": 1,
+  "surface": 45,
+  "address": "Calle Los Nardos, Quilpué",
+  "cover": "/fotos/AM-013/AM-013-01.jpeg",
+  "images": [
+    "/fotos/AM-013/AM-013-01.jpeg",
+    "/fotos/AM-013/AM-013-02.jpeg",
+    "/fotos/AM-013/AM-013-03.jpeg",
+    "/fotos/AM-013/AM-013-04.jpeg",
+    "/fotos/AM-013/AM-013-05.jpeg",
+    "/fotos/AM-013/AM-013-06.jpeg",
+    "/fotos/AM-013/AM-013-07.jpeg",
+    "/fotos/AM-013/AM-013-08.jpeg",
+    "/fotos/AM-013/AM-013-09.jpeg",
+    "/fotos/AM-013/AM-013-10.jpeg",
+    "/fotos/AM-013/AM-013-11.jpeg",
+    "/fotos/AM-013/AM-013-12.jpeg",
+    "/fotos/AM-013/AM-013-13.jpeg",
+    "/fotos/AM-013/AM-013-14.jpeg"
+  ]
+},
     
 {
     "id": "AM-002",
