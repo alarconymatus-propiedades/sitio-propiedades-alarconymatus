@@ -155,6 +155,9 @@
     <div id="lightboxCounter" class="lightbox-counter"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="./assets/config.js"></script>
+  <script src="./assets/data.js"></script>
   <script>
     (function(){
       const $ = s => document.querySelector(s);
@@ -242,11 +245,17 @@
         }
 
         try{
-          const res = await fetch('/data/properties.json',{cache:'no-store'});
-          if(!res.ok) throw new Error('No se pudo leer /data/properties.json ('+res.status+')');
-          const list = await res.json();
+          // Lee desde Supabase (panel de administración) con respaldo
+          // automático a data/properties.json. Ver assets/data.js.
+          const p = window.AYMData
+            ? await window.AYMData.obtener(id)
+            : await (async () => {
+                const res = await fetch('./data/properties.json',{cache:'no-store'});
+                if(!res.ok) throw new Error('No se pudo leer properties.json ('+res.status+')');
+                const list = await res.json();
+                return list.find(x => String(x.id) === String(id)) || null;
+              })();
 
-          const p = list.find(x => String(x.id) === String(id));
           if(!p){
             state.className='error';
             state.textContent='Propiedad no encontrada: '+id;

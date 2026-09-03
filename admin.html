@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel — AYM Propiedades</title>
+  <link rel="stylesheet" href="./assets/admin.css">
+</head>
+<body>
+
+<!-- ============ PANTALLA 1: INICIAR SESIÓN ============ -->
+<div id="pantallaLogin" class="login">
+  <form class="login-card" id="formLogin">
+    <img src="./assets/logo.png" alt="AYM Propiedades">
+    <h1>Panel de propiedades</h1>
+    <p class="sub">Ingresa con tu correo y contraseña</p>
+
+    <div id="avisoLogin"></div>
+
+    <div class="campo">
+      <label for="email">Correo</label>
+      <input type="email" id="email" autocomplete="username" required placeholder="tucorreo@gmail.com">
+    </div>
+
+    <div class="campo">
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" autocomplete="current-password" required placeholder="••••••••">
+    </div>
+
+    <button type="submit" class="btn btn-primario btn-grande" style="width:100%" id="btnEntrar">
+      Entrar
+    </button>
+  </form>
+</div>
+
+
+<!-- ============ PANTALLA 2: LISTA DE PROPIEDADES ============ -->
+<div id="pantallaApp" class="oculto">
+
+  <div class="topbar">
+    <div class="topbar-in">
+      <img src="./assets/logo.png" alt="">
+      <div class="marca">AYM Propiedades<small>Panel de administración</small></div>
+      <div class="der">
+        <span class="usuario" id="usuarioActual"></span>
+        <button class="btn btn-chico" id="btnSalir">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ---- vista lista ---- -->
+    <div id="vistaLista">
+      <div id="avisoLista"></div>
+
+      <div class="acciones">
+        <button class="btn btn-primario btn-grande" id="btnNueva">+ Publicar nueva propiedad</button>
+        <input type="text" class="buscar" id="buscar" placeholder="Buscar por título, comuna o código…">
+        <select id="filtroEstado" style="width:auto">
+          <option value="">Todas</option>
+          <option value="visibles">Solo publicadas</option>
+          <option value="ocultas">Solo ocultas</option>
+          <option value="Disponible">Disponibles</option>
+          <option value="Reservada">Reservadas</option>
+          <option value="Vendida">Vendidas</option>
+          <option value="Arrendada">Arrendadas</option>
+        </select>
+      </div>
+
+      <div class="contador" id="contador"></div>
+      <div class="lista" id="lista"></div>
+    </div>
+
+    <!-- ---- vista editor ---- -->
+    <div id="vistaEditor" class="oculto">
+      <div class="editor">
+        <h2 id="tituloEditor">Nueva propiedad</h2>
+        <p class="sub" id="subEditor">Completa los datos y sube las fotos. Puedes guardarla oculta y publicarla después.</p>
+
+        <div id="avisoEditor"></div>
+
+        <!-- ---------- FOTOS ---------- -->
+        <div class="grupo">
+          <h3>Fotos de la propiedad</h3>
+
+          <div class="zona" id="zonaFotos">
+            <div class="icono">📷</div>
+            <b>Haz clic aquí para elegir las fotos</b>
+            <span>o arrástralas desde tu computador · puedes elegir varias a la vez</span>
+          </div>
+          <input type="file" id="inputFotos" accept="image/*" multiple class="oculto">
+
+          <div class="subiendo oculto" id="progreso">
+            <div class="barra"><div id="barraRelleno"></div></div>
+            <div class="ayuda" id="textoProgreso" style="margin-top:7px"></div>
+          </div>
+
+          <div class="fotos" id="gridFotos"></div>
+          <p class="ayuda" id="ayudaFotos" style="margin-top:12px"></p>
+        </div>
+
+        <!-- ---------- DATOS PRINCIPALES ---------- -->
+        <div class="grupo">
+          <h3>Datos principales</h3>
+
+          <div class="campo">
+            <label for="fTitle">Título del aviso</label>
+            <p class="ayuda">Lo primero que ve la gente. Ej: «Vendo casa en Quilpué – 4D/2B»</p>
+            <input type="text" id="fTitle" required>
+          </div>
+
+          <div class="campo">
+            <label>Operación</label>
+            <div class="opciones" id="opsOperacion">
+              <button type="button" class="opcion" data-valor="Venta">Venta</button>
+              <button type="button" class="opcion" data-valor="Arriendo">Arriendo</button>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label>Estado</label>
+            <p class="ayuda">Cámbialo cuando la propiedad se reserve, se venda o se arriende.</p>
+            <div class="opciones" id="opsEstado">
+              <button type="button" class="opcion" data-valor="Disponible">Disponible</button>
+              <button type="button" class="opcion" data-valor="Reservada">Reservada</button>
+              <button type="button" class="opcion" data-valor="Vendida">Ya se vendió</button>
+              <button type="button" class="opcion" data-valor="Arrendada">Ya se arrendó</button>
+            </div>
+          </div>
+
+          <div class="fila">
+            <div class="campo">
+              <label for="fType">Tipo de propiedad</label>
+              <select id="fType">
+                <option>Casa</option>
+                <option>Departamento</option>
+                <option>Parcela</option>
+                <option>Terreno</option>
+                <option>Oficina</option>
+                <option>Local comercial</option>
+                <option>Bodega</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="fCommune">Comuna</label>
+              <input type="text" id="fCommune" list="comunas" placeholder="Ej: Quilpué">
+              <datalist id="comunas">
+                <option>Quilpué</option><option>Villa Alemana</option><option>Viña del Mar</option>
+                <option>Valparaíso</option><option>Limache</option><option>Olmué</option>
+                <option>Quillota</option><option>Concón</option><option>Casablanca</option>
+                <option>La Calera</option><option>San Antonio</option>
+              </datalist>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="fAddress">Dirección o sector</label>
+            <input type="text" id="fAddress" placeholder="Ej: Belloto 2000, Quilpué">
+          </div>
+        </div>
+
+        <!-- ---------- PRECIO ---------- -->
+        <div class="grupo">
+          <h3>Precio</h3>
+          <div class="fila">
+            <div class="campo">
+              <label for="fMoneda">¿En qué moneda?</label>
+              <select id="fMoneda">
+                <option value="CLP">Pesos chilenos ($)</option>
+                <option value="UF">UF</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="fPrecio">Monto</label>
+              <p class="ayuda" id="ayudaPrecio">Escribe solo números.</p>
+              <input type="text" id="fPrecio" inputmode="numeric" placeholder="150000000">
+              <p class="ayuda" id="precioPreview" style="margin-top:6px"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------- CARACTERÍSTICAS ---------- -->
+        <div class="grupo">
+          <h3>Características</h3>
+          <div class="fila">
+            <div class="campo">
+              <label for="fBedrooms">Dormitorios</label>
+              <input type="number" id="fBedrooms" min="0" placeholder="Ej: 3">
+            </div>
+            <div class="campo">
+              <label for="fBathrooms">Baños</label>
+              <input type="number" id="fBathrooms" min="0" placeholder="Ej: 2">
+            </div>
+          </div>
+          <div class="fila">
+            <div class="campo">
+              <label for="fSurface">Metros construidos (m²)</label>
+              <input type="number" id="fSurface" min="0" step="0.01" placeholder="Ej: 95">
+            </div>
+            <div class="campo">
+              <label for="fTerrain">Metros de terreno (m²)</label>
+              <input type="number" id="fTerrain" min="0" step="0.01" placeholder="Ej: 250">
+            </div>
+          </div>
+          <p class="ayuda">Si algún dato no corresponde, déjalo vacío y no se mostrará.</p>
+        </div>
+
+        <!-- ---------- TEXTOS ---------- -->
+        <div class="grupo">
+          <h3>Descripción</h3>
+
+          <div class="campo">
+            <label for="fSummary">Resumen corto</label>
+            <p class="ayuda">Una o dos líneas. Es lo que se lee bajo la foto en el listado.</p>
+            <textarea id="fSummary" style="min-height:70px"
+              placeholder="Casa de 2 pisos en Belloto 2000. 4D/2B, patio y estacionamiento."></textarea>
+          </div>
+
+          <div class="campo">
+            <label for="fDescription">Descripción completa</label>
+            <p class="ayuda">Todo el detalle del aviso. Puedes escribir en varias líneas.</p>
+            <textarea id="fDescription" style="min-height:230px"></textarea>
+          </div>
+        </div>
+
+        <!-- ---------- VISIBILIDAD ---------- -->
+        <div class="grupo">
+          <h3>Publicación</h3>
+          <label class="switch" for="fVisible">
+            <input type="checkbox" id="fVisible" checked>
+            <span>
+              <b>Mostrar esta propiedad en el sitio web</b>
+              <span>Si lo desmarcas, se guarda pero nadie la ve. Útil para prepararla antes de publicar,
+                    o para sacarla del sitio sin borrarla.</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="pie">
+          <button class="btn btn-peligro" id="btnEliminar">Eliminar propiedad</button>
+          <div class="der">
+            <button class="btn" id="btnCancelar">Cancelar</button>
+            <button class="btn btn-primario btn-grande" id="btnGuardar">Guardar</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ MODAL DE CONFIRMACIÓN ============ -->
+<div id="modal" class="modal oculto">
+  <div class="modal-card">
+    <h3 id="modalTitulo"></h3>
+    <p id="modalTexto"></p>
+    <div class="botones">
+      <button class="btn" id="modalNo">Cancelar</button>
+      <button class="btn btn-peligro" id="modalSi">Sí, continuar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="./assets/config.js"></script>
+<script src="./assets/admin.js"></script>
+</body>
+</html>

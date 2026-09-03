@@ -15,7 +15,10 @@ function fmtCLP(n){
   }catch(e){ return n; }
 }
 
+// Lee desde Supabase (lo que publica el panel) y, si no está disponible,
+// cae de vuelta a data/properties.json. La lógica vive en assets/data.js.
 async function loadProps(){
+  if (window.AYMData) return await window.AYMData.listar();
   const res = await fetch('./data/properties.json?v=' + Date.now());
   return await res.json();
 }
