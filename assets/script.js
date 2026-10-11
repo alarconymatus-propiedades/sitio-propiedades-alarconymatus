@@ -23,26 +23,43 @@ async function loadProps(){
   return await res.json();
 }
 
+// Todo lo que viene de los datos pasa por aquí antes de entrar al HTML.
+function esc(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
 function cardHtml(p){
-  const price = p.priceCLP ? fmtCLP(p.priceCLP) : (p.priceUF? `UF ${p.priceUF}` : "");
+  const price = p.priceCLP
+    ? fmtCLP(p.priceCLP) + (p.operation === "Arriendo" ? " / mes" : "")
+    : (p.priceUF ? `UF ${Number(p.priceUF).toLocaleString('es-CL')}` : "Precio a convenir");
   const op = p.operation || "";
-  const cover = p.cover || "https://picsum.photos/640/480?blur=1&random=" + encodeURIComponent(p.id);
+  const href = `./property.html?id=${encodeURIComponent(p.id)}`;
   const short = p.summary || "";
+  const noDisponible = p.status && p.status !== "Disponible";
+  // Miniatura si existe; si no carga, el navegador cae a la foto grande.
+  const mini = p.coverThumb || p.cover;
+  const foto = p.cover
+    ? `<img src="${esc(mini)}" data-grande="${esc(p.cover)}" alt="${esc(p.title)}" loading="lazy"
+           onerror="if(this.dataset.grande&&this.src!==this.dataset.grande){this.src=this.dataset.grande}else{this.onerror=null}">`
+    : `<div class="sinfoto">Sin foto</div>`;
   return `
-  <article class="card">
-    <a href="./property.html?id=${encodeURIComponent(p.id)}">
-      <img src="${cover}" alt="${p.title}">
+  <article class="card${noDisponible ? " card-" + esc(p.status.toLowerCase()) : ""}">
+    <a href="${href}" class="thumb">
+      ${foto}
+      ${noDisponible ? `<span class="cinta">${esc(p.status)}</span>` : ""}
     </a>
     <div class="pad">
       <div class="badges">
-        ${op? `<span class="badge">${op}</span>`:""}
-        ${p.type? `<span class="badge">${p.type}</span>`:""}
-        ${p.commune? `<span class="badge">${p.commune}</span>`:""}
-        ${p.status? `<span class="badge">${p.status}</span>`:""}
+        ${op ? `<span class="badge">${esc(op)}</span>` : ""}
+        ${p.type ? `<span class="badge">${esc(p.type)}</span>` : ""}
+        ${p.commune ? `<span class="badge">${esc(p.commune)}</span>` : ""}
+        ${p.status ? `<span class="badge badge-${esc(p.status.toLowerCase())}">${esc(p.status)}</span>` : ""}
       </div>
-      <h3 style="margin:8px 0"><a href="./property.html?id=${encodeURIComponent(p.id)}">${p.title}</a></h3>
-      <div class="price">${price}</div>
-      <p class="small">${short}</p>
+      <h3 style="margin:8px 0"><a href="${href}">${esc(p.title)}</a></h3>
+      <div class="price">${esc(price)}</div>
+      <p class="small">${esc(short)}</p>
     </div>
   </article>`;
 }

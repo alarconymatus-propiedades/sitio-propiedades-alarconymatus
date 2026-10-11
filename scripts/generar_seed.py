@@ -24,6 +24,20 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JSON_PROPS = os.path.join(RAIZ, "data", "properties.json")
 DIR_FOTOS = os.path.join(RAIZ, "fotos")
 SALIDA = os.path.join(RAIZ, "supabase", "seed.sql")
+SCHEMA = os.path.join(RAIZ, "supabase", "schema.sql")
+SETUP = os.path.join(RAIZ, "supabase", "setup.sql")
+
+# Los tipos tal como los muestra el panel (misma letra mayúscula/minúscula)
+TIPOS = ["Casa", "Departamento", "Parcela", "Terreno", "Oficina",
+         "Local comercial", "Bodega", "Otro"]
+
+
+def tipo_canonico(t):
+    t = (t or "Casa").strip()
+    for c in TIPOS:
+        if c.lower() == t.lower():
+            return c
+    return t
 
 EXT_IMG = (".jpg", ".jpeg", ".png", ".webp", ".JPG", ".JPEG", ".PNG", ".WEBP")
 
@@ -111,7 +125,7 @@ for p in existentes:
         "codigo": codigo,
         "title": p.get("title"),
         "operation": op,
-        "type": p.get("type") or "Casa",
+        "type": tipo_canonico(p.get("type")),
         "commune": p.get("commune"),
         "address": p.get("address"),
         "status": st,
@@ -240,7 +254,25 @@ with io.open(SALIDA, "w", encoding="utf-8", newline="\n") as fh:
     fh.write("\n".join(lineas))
 
 # ----------------------------------------------------------------------
-print("Generado: supabase/seed.sql")
+# 4. setup.sql = schema.sql + seed.sql, para pegar UNA sola vez en Supabase
+# ----------------------------------------------------------------------
+with io.open(SCHEMA, encoding="utf-8") as fh:
+    schema = fh.read()
+with io.open(SETUP, "w", encoding="utf-8", newline="\n") as fh:
+    fh.write(
+        "-- ============================================================\n"
+        "--  AYM Propiedades — PUESTA EN MARCHA EN UN SOLO PASO\n"
+        "--  (generado por scripts/generar_seed.py: schema.sql + seed.sql)\n"
+        "--\n"
+        "--  1. Crea antes el usuario en Authentication -> Users\n"
+        "--  2. Pega TODO este archivo en SQL Editor -> New query -> Run\n"
+        "--  Es seguro ejecutarlo más de una vez.\n"
+        "-- ============================================================\n\n"
+    )
+    fh.write(schema.rstrip() + "\n\n")
+    fh.write("\n".join(lineas))
+
+print("Generado: supabase/seed.sql y supabase/setup.sql")
 print("  %d propiedades en total" % len(filas))
 print("  %d fotos referenciadas" % sum(len(f["images"]) for f in filas))
 print("  %d publicadas / %d ocultas para revisar"

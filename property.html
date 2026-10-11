@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Propiedad — AYM Propiedades</title>
   <meta name="description" content="Detalle de propiedad y galería de fotos - AYM Propiedades" />
+  <link rel="icon" href="./assets/logo.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./assets/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AYM Propiedades" />
+  <meta property="og:locale" content="es_CL" />
+  <meta property="og:title" content="Propiedad en venta o arriendo — AYM Propiedades" />
+  <meta property="og:description" content="Corredora de propiedades en Quilpué, Villa Alemana, Viña del Mar y alrededores." />
+  <meta property="og:image" content="https://www.alarconymatuspropiedades.cl/assets/logo.png" />
+  <meta name="twitter:card" content="summary" />
   <style>
     :root{
       --brand:#c7801e; --ink:#0f172a; --muted:#64748b;
@@ -155,7 +164,6 @@
     <div id="lightboxCounter" class="lightbox-counter"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="./assets/config.js"></script>
   <script src="./assets/data.js"></script>
   <script>
@@ -290,8 +298,15 @@
           // Portada
           const cover   = p.cover || (arr(p.images)[0] || '');
           const coverEl = $('#cover');
-          coverEl.src = cover;
           coverEl.classList.remove('skeleton');
+          if (cover) {
+            // Miniatura (más liviana); si no existe, cae a la foto grande.
+            const mini = p.coverThumb || cover;
+            if (mini !== cover) coverEl.onerror = () => { coverEl.onerror = null; coverEl.src = cover; };
+            coverEl.src = mini;
+          } else {
+            coverEl.style.display = 'none';   // sin fotos: no mostramos una imagen rota
+          }
 
           // Galería (incluye portada si no viene en images)
           const images = arr(p.images);
@@ -304,11 +319,14 @@
           if(!images.length){
             gal.innerHTML = '<div class="muted">Sin imágenes disponibles.</div>';
           }else{
+            const thumbs = arr(p.thumbs);
             images.forEach((src, index) => {
               const img = document.createElement('img');
               img.loading = 'lazy';
-              img.alt     = 'Foto de la propiedad';
-              img.src     = src;
+              img.alt     = 'Foto ' + (index + 1) + ' de ' + images.length;
+              const mini  = thumbs[index] || src;   // la galería usa miniaturas; el visor, la grande
+              if (mini !== src) img.onerror = () => { img.onerror = null; img.src = src; };
+              img.src     = mini;
               img.addEventListener('click', () => openLightbox(index));
               gal.appendChild(img);
             });

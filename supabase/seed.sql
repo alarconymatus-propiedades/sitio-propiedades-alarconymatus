@@ -477,7 +477,7 @@ insert into public.propiedades
    price_clp, price_uf, summary, description,
    bedrooms, bathrooms, surface, terrain, images, visible)
 values
-  ('AM-013', 'Arriendo Local Comercial en Quilpué – $600.000', 'Arriendo', 'Local Comercial', 'Quilpué', 'Calle Los Nardos, Quilpué', 'Disponible',
+  ('AM-013', 'Arriendo Local Comercial en Quilpué – $600.000', 'Arriendo', 'Local comercial', 'Quilpué', 'Calle Los Nardos, Quilpué', 'Disponible',
    600000, null, 'Local comercial de 45 m² habilitado para carnicería. Excelente ubicación en calle Los Nardos.', 'ARRIENDO LOCAL COMERCIAL – QUILPUÉ – $600.000
 Página web: alarconymatuspropiedades.cl
 
