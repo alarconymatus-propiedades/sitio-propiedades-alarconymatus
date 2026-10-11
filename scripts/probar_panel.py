@@ -99,7 +99,11 @@ def main():
             assert "Belloto" in page.locator("#title").inner_text()
             assert page.locator("#gallery img").count() > 5
             assert page.locator("#cover").is_visible()
-        paso("property.html muestra la ficha AM-014 con galería", t_ficha)
+            wa = page.locator("#ctaWa").get_attribute("href")
+            assert wa.startswith("https://wa.me/56990003574?text=") and "AM-014" in wa, wa
+            assert page.locator("#ctaTel").get_attribute("href") == "tel:+56990003574"
+            assert "alarconymatus@gmail.com" in page.locator("#ctaExtra").inner_text()
+        paso("property.html muestra la ficha AM-014 con galería y botones de contacto", t_ficha)
 
         print("Panel: entrar")
 
@@ -267,6 +271,26 @@ def main():
             expect(page.locator("#vistaLista")).to_be_visible()
         paso("el botón «atrás» del celular no la saca del editor sin preguntar", t_atras)
 
+        def t_validaciones():
+            page.click("#btnNueva")
+            expect(page.locator("#vistaEditor")).to_be_visible()
+            page.fill("#fTitle", "Prueba validaciones")
+            page.fill("#fPrecio", "$ 150.000.000")
+            expect(page.locator("#precioPreview")).to_contain_text("$150.000.000")
+            page.fill("#fBathrooms", "1,5")
+            page.click("#btnGuardar")
+            expect(page.locator("#avisoEditor")).to_contain_text("número entero")
+            assert page.locator("#vistaEditor").is_visible(), "guardó con baños decimales"
+            page.fill("#fBathrooms", "")
+            page.fill("#fPrecio", "abc")
+            page.click("#btnGuardar")
+            expect(page.locator("#avisoEditor")).to_contain_text("Revisa el precio")
+            page.click("#btnCancelar")
+            page.click("#modalSi")
+            expect(page.locator("#vistaLista")).to_be_visible()
+            assert "Prueba validaciones" not in page.locator("#lista").inner_text(), "se guardó con datos inválidos"
+        paso("precio con $ y puntos se entiende; decimales en baños y precio inválido no se guardan", t_validaciones)
+
         print("Panel: estados")
 
         def t_ocultar():
@@ -355,8 +379,20 @@ def main():
             expect(page.locator("#avisoLogin")).to_contain_text("Escribe tu correo")
             page.fill("#email", "fanny@ejemplo.cl")
             page.click("#btnOlvide")
-            expect(page.locator("#avisoLogin")).to_contain_text("Te enviamos un correo")
+            expect(page.locator("#avisoLogin")).to_contain_text("te llegará un mensaje")
         paso("olvidé mi contraseña envía el correo", t_olvide)
+
+        def t_noadmin():
+            page.fill("#email", "noadmin@ejemplo.cl")
+            page.fill("#password", "demo1234")
+            page.click("#btnEntrar")
+            expect(page.locator("#pantallaApp")).to_be_visible(timeout=10000)
+            expect(page.locator("#avisoLista")).to_contain_text("no está autorizada")
+            assert page.locator("#btnNueva").is_disabled()
+            page.click("#btnSalir")
+            page.click("#modalSi")
+            expect(page.locator("#pantallaLogin")).to_be_visible()
+        paso("una cuenta que no está en administradores ve el aviso y no puede publicar", t_noadmin)
 
         def t_errores():
             assert not errores_js, "\n".join(errores_js[:5])

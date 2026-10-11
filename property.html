@@ -67,6 +67,21 @@
       box-shadow:0 10px 20px rgba(0,0,0,.18)
     }
     .muted{color:var(--muted)}
+
+    /* ---------- CONTACTO ---------- */
+    .contacto{margin-top:28px;padding:20px;border-radius:14px;background:#fdf6ec;border:1px solid #f3d2b3}
+    .contacto h2{margin:0 0 4px;font-size:20px}
+    .contacto p{margin:0 0 14px;color:var(--muted)}
+    .ctas{display:flex;gap:10px;flex-wrap:wrap}
+    .cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+      padding:12px 18px;border-radius:12px;font-weight:700;text-decoration:none;font-size:16px;
+      border:1px solid var(--ring);background:#fff;color:var(--ink)}
+    .cta:hover{background:#f8fafc}
+    .cta-wa{background:#15803d;border-color:#15803d;color:#fff}
+    .cta-wa:hover{background:#166534}
+    .contacto .extra{margin-top:12px;font-size:14px;color:var(--muted)}
+    .contacto .extra a{color:#8a5a1a}
+    @media(max-width:520px){.ctas .cta{flex:1 1 100%}}
     .error{
       padding:14px;border-radius:12px;border:1px solid #fecaca;
       background:#fff1f2;color:#7f1d1d
@@ -149,6 +164,16 @@
 
       <div class="section-title">Galería</div>
       <div id="gallery" class="gallery"></div>
+
+      <div class="contacto" id="contacto">
+        <h2>¿Te interesa esta propiedad?</h2>
+        <p>Escríbenos o llámanos y menciona el código <strong id="ctaCodigo"></strong>.</p>
+        <div class="ctas">
+          <a class="cta cta-wa" id="ctaWa" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+          <a class="cta" id="ctaTel">Llamar</a>
+        </div>
+        <div class="extra" id="ctaExtra"></div>
+      </div>
     </div>
   </div>
 
@@ -334,6 +359,32 @@
             // también puedes abrir lightbox desde la portada
             coverEl.style.cursor = 'pointer';
             coverEl.addEventListener('click', () => openLightbox(0));
+          }
+
+          // Contacto: WhatsApp con el mensaje ya escrito, llamar, y el resto de datos
+          const S = (window.AYM_CONFIG && window.AYM_CONFIG.SITIO) || {};
+          const tels = Array.isArray(S.telefonos) ? S.telefonos : [];
+          const soloDigitos = t => String(t).replace(/\D/g, '');
+          $('#ctaCodigo').textContent = p.id;
+          if (tels.length) {
+            const msg = 'Hola, me interesa la propiedad ' + p.id + ' (' + (p.title || '') + '). ' + location.href;
+            $('#ctaWa').href  = 'https://wa.me/' + soloDigitos(tels[0]) + '?text=' + encodeURIComponent(msg);
+            $('#ctaTel').href = 'tel:+' + soloDigitos(tels[0]);
+            $('#ctaTel').textContent = 'Llamar al ' + tels[0];
+          } else {
+            $('#contacto').style.display = 'none';
+          }
+          const extra = $('#ctaExtra');
+          if (tels[1]) {
+            const a = document.createElement('a');
+            a.href = 'tel:+' + soloDigitos(tels[1]); a.textContent = tels[1];
+            extra.append('También al ', a);
+          }
+          if (S.email) {
+            const m = document.createElement('a');
+            m.href = 'mailto:' + S.email + '?subject=' + encodeURIComponent('Consulta por ' + p.id);
+            m.textContent = S.email;
+            extra.append(tels[1] ? ' · Correo: ' : 'Correo: ', m);
           }
 
           state.style.display='none';

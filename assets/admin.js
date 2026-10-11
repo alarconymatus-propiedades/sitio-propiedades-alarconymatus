@@ -27,6 +27,10 @@
   var sesionEditor   = 0;      // cambia cada vez que se abre/cierra el editor (descarta subidas tardías)
   var codigoPromesa  = null;   // RPC en vuelo que reserva el código de la propiedad nueva
   var wakeLock       = null;   // mantiene la pantalla encendida mientras suben fotos
+  var esAdmin        = true;   // se confirma con es_admin() al entrar
+  var guardando      = false;  // hay un guardado en vuelo: no se puede salir del editor
+  var idNuevo        = null;   // uuid de la propiedad nueva (guardar dos veces no la duplica)
+  var _ignorarPop    = false;  // el próximo popstate lo provocamos nosotros
 
   var $ = function (id) { return document.getElementById(id); };
 
@@ -96,6 +100,12 @@
       return "No tienes permiso para hacer eso. Cierra sesión y vuelve a entrar.";
     if (/JWT|token is expired|session missing|Auth session/i.test(m))
       return "Tu sesión expiró. Vuelve a iniciar sesión (tus cambios siguen en pantalla).";
+    if (/not authorized|email_address_not_authorized/i.test(m))
+      return "No se pudo enviar el correo. Pídele a Nelson que te cambie la contraseña.";
+    if (/permission denied for table/i.test(m))
+      return "Falta terminar de preparar la base de datos (permisos). Avísale a Nelson.";
+    if (/invalid input syntax for type integer/i.test(m))
+      return "Dormitorios y baños van en números enteros, sin decimales.";
     if (/PGRST116|multiple \(or no\) rows/i.test(m))
       return "Esta propiedad ya no existe (quizás se borró desde otro dispositivo). Vuelve a la lista.";
     if (/Bucket not found|relation .* does not exist|42P01/i.test(m))
@@ -146,10 +156,12 @@
      ========================================================= */
   var _confirmarCb = null, _confirmarNo = null;
   // suave=true: el botón de confirmar es naranjo (acción normal), no rojo (destructiva).
-  function confirmar(titulo, texto, textoBoton, cb, cbNo, suave) {
+  // textoNo: texto del botón de la izquierda (por defecto «Cancelar»).
+  function confirmar(titulo, texto, textoBoton, cb, cbNo, suave, textoNo) {
     $("modalTitulo").textContent = titulo;
     $("modalTexto").textContent  = texto;
     $("modalSi").textContent     = textoBoton;
+    $("modalNo").textContent     = textoNo || "Cancelar";
     $("modalSi").className       = "btn " + (suave ? "btn-primario" : "btn-peligro");
     _confirmarCb = cb; _confirmarNo = cbNo || null;
     $("modal").classList.remove("oculto");
@@ -201,6 +213,12 @@
 
       if (modoRecuperar) { mostrarClave(); return; }
 
+      // Enlace del correo vencido o ya usado
+      if (/error_code=otp_expired|error=access_denied/.test(location.hash)) {
+        aviso("avisoLogin", "Ese enlace ya venció o ya se usó. Escribe tu correo y pide uno nuevo con «¿Olvidaste tu contraseña?».", "warn");
+        if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+      }
+
       sb.auth.getSession().then(function (res) {
         if (res.data && res.data.session) entrarAlPanel(res.data.session);
       });
@@ -211,7 +229,8 @@
     var el = $("estadoConexion");
     if (cfg.MOCK) { el.textContent = "Modo de prueba: simulador local, sin datos reales."; el.className = "conexion"; return; }
     el.textContent = "Comprobando conexión…"; el.className = "conexion";
-    conTimeout(sb.from("propiedades").select("id", { count: "exact", head: true }), 12000)
+    // GET (no HEAD): así, si algo falla, llega el detalle del error.
+    conTimeout(sb.from("propiedades").select("id", { count: "exact" }).eq("visible", true).range(0, 0), 12000)
       .then(function (res) {
         if (res.error) throw res.error;
         var n = res.count || 0;
@@ -219,12 +238,14 @@
         el.className = "conexion ok";
       })
       .catch(function (err) {
-        var m = (err && err.message) || "";
+        var m = ((err && err.message) || "") + " " + ((err && err.code) || "");
         el.className = "conexion mal";
-        if (/relation|does not exist|42P01|schema cache/i.test(m))
+        if (/relation|does not exist|42P01|PGRST205|schema cache/i.test(m))
           el.textContent = "Conectado, pero falta crear la tabla: ejecuta supabase/setup.sql en Supabase.";
-        else if (/Invalid API key|JWT|401/i.test(m))
-          el.textContent = "La llave de assets/config.js no es válida. Copia de nuevo la llave «anon public».";
+        else if (/permission denied for table|42501/i.test(m))
+          el.textContent = "Conectado, pero faltan permisos de la tabla: vuelve a ejecutar supabase/setup.sql en Supabase.";
+        else if (/Invalid API key|JWT|401|apikey/i.test(m))
+          el.textContent = "La llave de assets/config.js no es válida. Copia de nuevo la «Publishable key» (sb_publishable_…).";
         else
           el.textContent = "No se pudo conectar a la base de datos. Revisa la URL de assets/config.js y tu internet.";
       });
@@ -247,6 +268,19 @@
     $("pantallaApp").classList.remove("oculto");
     $("usuarioActual").textContent = (sesion && sesion.user && sesion.user.email) || "";
     cargarPropiedades();
+    // Tener cuenta no basta: el correo tiene que estar en la tabla administradores.
+    sb.rpc("es_admin").then(function (r) {
+      if (!r.error && r.data === false) {
+        esAdmin = false;
+        aviso("avisoLista",
+          "Tu cuenta entró, pero todavía no está autorizada para publicar. Pídele a Nelson que agregue " +
+          "tu correo en la lista de administradores de Supabase.", "error");
+        $("btnNueva").disabled = true;
+      } else {
+        esAdmin = true;
+        $("btnNueva").disabled = false;
+      }
+    }, function () {});
   }
 
   /* =========================================================
@@ -284,11 +318,12 @@
       $("email").focus();
       return;
     }
-    var destino = location.origin + location.pathname;
+    // Destino fijo: tiene que coincidir con «Redirect URLs» en Supabase.
+    var destino = cfg.MOCK ? location.origin + location.pathname : (SITIO.url || location.origin) + "/admin.html";
     sb.auth.resetPasswordForEmail(email, { redirectTo: destino }).then(function (res) {
       if (res.error) { aviso("avisoLogin", mensajeError(res.error), "error"); return; }
-      aviso("avisoLogin", "Te enviamos un correo a " + email + " con un enlace para crear una contraseña nueva. " +
-        "Revisa también la carpeta de spam.", "ok");
+      aviso("avisoLogin", "Si ese correo tiene cuenta, te llegará un mensaje con un enlace para crear una contraseña nueva. " +
+        "Revisa también la carpeta de spam. Si en 10 minutos no llega nada, pídele a Nelson que te la cambie.", "ok");
     });
   };
 
@@ -317,8 +352,9 @@
       ? "Tienes cambios sin guardar que se perderán. ¿Quieres salir igual?"
       : "¿Quieres salir del panel?";
     confirmar("Cerrar sesión", texto, "Sí, salir", function () {
-      cerrarEditor(true);
-      sb.auth.signOut().then(mostrarLogin);
+      if (!$("vistaEditor").classList.contains("oculto")) cerrarEditor(true);
+      // scope local: cerrar sesión aquí no la cierra en el celular.
+      sb.auth.signOut({ scope: "local" }).then(mostrarLogin);
     });
   };
 
@@ -452,9 +488,12 @@
   };
 
   function actualizar(p, cambios, mensaje) {
-    conTimeout(sb.from("propiedades").update(cambios).eq("id", p.id), 20000)
+    if (!esAdmin) { aviso("avisoLista", "Tu cuenta no está autorizada para hacer cambios. Avísale a Nelson.", "error"); return; }
+    // .select(): si no se tocó ninguna fila (sin permiso, o la borraron en otro equipo) lo sabemos.
+    conTimeout(sb.from("propiedades").update(cambios).eq("id", p.id).select("id"), 20000)
       .then(function (res) {
         if (res.error) throw res.error;
+        if (!res.data || !res.data.length) throw new Error("PGRST116");
         Object.assign(p, cambios);
         dibujarLista();
         toast(p.codigo + " " + (mensaje || "guardada") + ".");
@@ -496,10 +535,20 @@
   // El botón/gesto "atrás" del celular no debe sacarla del panel a mitad de una edición:
   // abre el mismo diálogo que «Volver».
   window.addEventListener("popstate", function () {
+    if (_ignorarPop) { _ignorarPop = false; return; }
     if ($("vistaEditor").classList.contains("oculto")) return;
     history.pushState({ editor: true }, "");
     $("btnCancelar").click();
   });
+
+  function nuevoUuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    var b = new Uint8Array(16);
+    (window.crypto || window.msCrypto).getRandomValues(b);
+    b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+    var h = Array.prototype.map.call(b, function (x) { return (x + 256).toString(16).slice(1); }).join("");
+    return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20);
+  }
 
   /* ---------- borrador automático (sobrevive a recargas y cierres) ---------- */
   var CLAVE_BORRADOR = "aym_borrador";
@@ -511,10 +560,12 @@
     _borradorTimer = setTimeout(guardarBorrador, 300);
   }
   function guardarBorrador() {
-    if ($("vistaEditor").classList.contains("oculto")) return;
+    // Solo si de verdad cambió algo: abrir una ficha y mirarla no debe pisar otro borrador.
+    if ($("vistaEditor").classList.contains("oculto") || !sucio) return;
     try {
       localStorage.setItem(CLAVE_BORRADOR, JSON.stringify({
         editandoId: editando ? editando.id : null,
+        idNuevo: editando ? null : idNuevo,
         codigoNuevo: codigoNuevo, operacion: operacion, estado: estado, fotos: fotos,
         visible: $("fVisible").checked,
         campos: CAMPOS.reduce(function (o, id) { o[id] = $(id).value; return o; }, {})
@@ -527,6 +578,12 @@
   function borrarBorrador() {
     clearTimeout(_borradorTimer);
     try { localStorage.removeItem(CLAVE_BORRADOR); } catch (e) {}
+  }
+  // Borra el borrador solo si es de lo que se está editando ahora (no el de otra propiedad).
+  function borrarBorradorPropio() {
+    clearTimeout(_borradorTimer);
+    var b = leerBorrador();
+    if (b && (b.editandoId || null) === (editando ? editando.id : null)) borrarBorrador();
   }
   function fotosNuevasDe(lista) {
     // Fotos subidas a Storage en esta edición que la propiedad guardada no tiene.
@@ -541,14 +598,22 @@
     var titulo = (b.campos && b.campos.fTitle) || "(sin título)";
     confirmar("Tienes cambios sin guardar",
       "Quedó a medio hacer «" + titulo + "» con " + fotosB.length + " foto" + (fotosB.length === 1 ? "" : "s") +
-      ". ¿Quieres seguir con eso?",
+      ". ¿Quieres seguir con eso?\n\nSi eliges «Empezar de cero», se borra lo que tenías a medio hacer, fotos incluidas.",
       "Sí, seguir",
       function () { restaurarBorrador(b); },
       function () {
-        borrarDeStorage(fotosNuevasDe(fotosB));
         borrarBorrador();
+        var huerfanas = fotosNuevasDe(fotosB);
+        if (!huerfanas.length) return;
+        // Si en realidad sí alcanzó a guardarse (se cortó internet justo al guardar),
+        // esas fotos son de una propiedad publicada: no se tocan.
+        if (!b.idNuevo) { borrarDeStorage(huerfanas); return; }
+        sb.from("propiedades").select("id").eq("id", b.idNuevo).then(function (r) {
+          if (!r.error && r.data && r.data.length === 0) borrarDeStorage(huerfanas);
+        });
       },
-      true);
+      true,
+      "Empezar de cero");
   }
   function restaurarBorrador(b) {
     CAMPOS.forEach(function (id) { if (b.campos && b.campos[id] != null) $(id).value = b.campos[id]; });
@@ -559,6 +624,7 @@
       codigoNuevo = b.codigoNuevo;
       $("tituloEditor").textContent = "Nueva propiedad · " + codigoNuevo;
     }
+    if (!editando && b.idNuevo) idNuevo = b.idNuevo;
     fotos = (Array.isArray(b.fotos) ? b.fotos : []).filter(function (f) { return f && f.url; });
     $("fVisible").checked = b.visible !== false;
     seleccionar("opsOperacion", operacion);
@@ -588,6 +654,10 @@
     fotosListas   = null;
     codigoNuevo   = null;
     codigoPromesa = null;
+    idNuevo       = p ? null : nuevoUuid();
+    subidasEnCurso = 0;
+    actualizarBotonGuardar();
+    $("progreso").classList.add("oculto");
     aviso("avisoEditor", "");
 
     if (p) {
@@ -663,6 +733,7 @@
 
   $("btnNueva").onclick    = function () { abrirEditor(null); };
   $("btnCancelar").onclick = function () {
+    if (guardando) { toast("Espera un momento, se está guardando…"); return; }
     if (!hayCambiosSinGuardar()) { cerrarEditor(); return; }
     confirmar("Salir sin guardar", "Se perderán los cambios que no hayas guardado. ¿Seguro?", "Sí, salir sin guardar",
       function () { cerrarEditor(true); });
@@ -672,14 +743,19 @@
     if (descartar) {
       // Las fotos que subió en esta edición y no guardó no deben quedar botadas en Storage.
       borrarDeStorage(fotosNuevasDe(fotos));
-      sucio = false; subidasEnCurso = 0; actualizarBotonGuardar();
+      sucio = false;
     }
-    borrarBorrador();
+    borrarBorradorPropio();
     sesionEditor++;
-    editando = null; codigoNuevo = null; codigoPromesa = null; fotosListas = null;
+    subidasEnCurso = 0; actualizarBotonGuardar(); soltarPantalla();
+    $("progreso").classList.add("oculto");
+    editando = null; codigoNuevo = null; codigoPromesa = null; fotosListas = null; idNuevo = null;
     fotos = []; fotosBorrar = [];
     $("vistaEditor").classList.add("oculto");
     $("vistaLista").classList.remove("oculto");
+    // Sacamos del historial la entrada que agregó abrirEditor, para que el
+    // siguiente «atrás» del celular haga lo que ella espera.
+    if (history.state && history.state.editor) { _ignorarPop = true; history.back(); }
     window.scrollTo(0, 0);
   }
 
@@ -706,12 +782,22 @@
   function num(id) {
     var v = $(id).value.trim();
     if (v === "") return null;
-    // acepta "150.000.000", "150000000", "3200,5" y "3.200,50"
-    v = v.replace(/\s/g, "");
-    if (v.indexOf(",") !== -1) v = v.replace(/\./g, "").replace(",", ".");
+    // acepta "150.000.000", "150000000", "$ 150.000.000", "UF 3.200", "3200,5",
+    // "3.200,50" y "1,500,000"
+    v = v.replace(/[^\d.,-]/g, "");
+    if (!/\d/.test(v)) return null;
+    var comas = (v.match(/,/g) || []).length;
+    if (comas > 1) v = v.replace(/,/g, "");
+    else if (comas === 1) v = v.replace(/\./g, "").replace(",", ".");
     else if ((v.match(/\./g) || []).length > 1 || /\.\d{3}$/.test(v)) v = v.replace(/\./g, "");
     var n = parseFloat(v);
     return isNaN(n) ? null : n;
+  }
+  // true si el campo está vacío o tiene un número entero >= 0
+  function enteroValido(id) {
+    if (!$(id).value.trim()) return true;
+    var n = num(id);
+    return n != null && n >= 0 && Math.floor(n) === n;
   }
   function precioActual() {
     var n = num("fPrecio");
@@ -898,7 +984,10 @@
 
         var c = document.createElement("canvas");
         c.width = w; c.height = h;
-        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = "#fff";           // JPEG no tiene transparencia: fondo blanco, no negro
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
         c.toBlob(function (blob) {
           if (!blob) return resolve(yaSirve ? file : null);
           resolve(yaSirve && blob.size >= file.size ? file : blob);
@@ -933,14 +1022,25 @@
     }
     if (!files.length) return;
 
+    var gen = sesionEditor;
+
     // Propiedad nueva: esperamos a tener el código para que las fotos vayan a su carpeta.
+    // Mientras tanto Guardar queda bloqueado y se ve que algo está pasando.
     if (!editando && !codigoNuevo && codigoPromesa) {
       var cp = codigoPromesa; codigoPromesa = null;
-      cp.then(function () { subirFotos(files); });
+      subidasEnCurso += files.length;
+      actualizarBotonGuardar();
+      $("progreso").classList.remove("oculto");
+      $("barraRelleno").style.width = "0%";
+      $("textoProgreso").textContent = "Preparando…";
+      cp.then(function () {
+        if (gen !== sesionEditor) return;        // ya cerró o cambió de propiedad
+        subidasEnCurso = Math.max(0, subidasEnCurso - files.length);
+        subirFotos(files);
+      });
       return;
     }
 
-    var gen     = sesionEditor;
     var carpeta = (editando && editando.codigo) || codigoNuevo || "sin-codigo";
     var total = files.length, hechas = 0, fallidas = [];
     subidasEnCurso += total;
@@ -954,13 +1054,16 @@
 
     function paso() {
       hechas++;
-      if (gen === sesionEditor) subidasEnCurso = Math.max(0, subidasEnCurso - 1);
-      $("barraRelleno").style.width = Math.round(hechas / total * 100) + "%";
-      $("textoProgreso").textContent = "Subiendo " + hechas + " de " + total + "… no cierres esta página.";
+      var vigente = gen === sesionEditor;
+      if (vigente) {
+        subidasEnCurso = Math.max(0, subidasEnCurso - 1);
+        $("barraRelleno").style.width = Math.round(hechas / total * 100) + "%";
+        $("textoProgreso").textContent = "Subiendo " + hechas + " de " + total + "… no cierres esta página.";
+      }
       if (hechas === total) {
+        if (!vigente) return;
         actualizarBotonGuardar();
-        soltarPantalla();
-        if (gen !== sesionEditor) return;
+        if (subidasEnCurso === 0) soltarPantalla();
         setTimeout(function () {
           $("progreso").classList.add("oculto");
           if (fallidas.length) {
@@ -979,6 +1082,8 @@
     files.forEach(function (file, idx) {
       cadena = cadena.then(function () {
         var nombre = file.name || ("foto " + (idx + 1));
+        // Si ya cerró o cambió de propiedad, no seguimos gastando datos en estas fotos.
+        if (gen !== sesionEditor) { paso(); return; }
         return achicar(file).then(function (blob) {
           if (!blob) { fallidas.push(nombre); paso(); return; }
           var tipo = blob.type || file.type || "image/jpeg";
@@ -1064,11 +1169,15 @@
   }
 
   // Quita del texto las líneas de contacto/redes: el aviso las agrega al final.
+  // Solo borra rótulos seguidos de «:» o líneas que son SOLO un teléfono, para no
+  // llevarse cosas como «Contacto directo con la naturaleza» o «569 m² de terreno».
+  var RE_CONTACTO = /^(contacto(\s+\S+){0,3}|cont[aá]ctanos|facebook|instagram|p[aá]gina\s+web|web|s[ií]guenos(\s+\S+){0,3}|ll[aá]manos|whatsapp)\s*:/i;
+  var RE_TELEFONO = /^(\+?56\s?)?9\s?\d{4}\s?\d{4}$/;
   function limpiarDescripcion(texto) {
     return String(texto || "").split("\n").filter(function (l) {
       var t = l.trim();
       if (!t) return true;
-      return !/^(contacto|cont[aá]ctanos|facebook|instagram|p[aá]gina web|pagina web|web:|s[ií]guenos|ll[aá]manos|whatsapp|\+?56\s?9|\+?56\s?\d{9}|9\s?\d{4}\s?\d{4}$)/i.test(t);
+      return !(RE_CONTACTO.test(t) || RE_TELEFONO.test(t));
     }).join("\n").replace(/\n{3,}/g, "\n\n").trim();
   }
 
@@ -1188,6 +1297,7 @@
 
     // Primer toque: descargar (máximo 10, que es lo que acepta Instagram por publicación).
     var lista = fotos.slice(0, 10);
+    var gen = sesionEditor;
     btn.disabled = true; btn.textContent = "Preparando fotos…";
     Promise.all(lista.map(function (f, i) {
       return fetch(f.url).then(function (r) { if (!r.ok) throw new Error("foto " + (i + 1)); return r.blob(); })
@@ -1196,12 +1306,14 @@
           return new File([b], (d.codigo || "foto") + "-" + (i + 1) + "." + ext, { type: b.type || "image/jpeg" });
         });
     })).then(function (files) {
+      if (gen !== sesionEditor) return;   // ya está en otra propiedad
       fotosListas = files;
       btn.disabled = false;
       btn.textContent = "📤 Enviar " + files.length + " foto" + (files.length === 1 ? "" : "s") + " ahora";
       toast("Fotos listas. Toca de nuevo para elegir Instagram o WhatsApp." +
             (fotos.length > 10 ? " (Se envían las 10 primeras.)" : ""));
     }).catch(function (e) {
+      if (gen !== sesionEditor) return;
       btn.disabled = false; btn.textContent = "📷 Preparar fotos para Instagram / WhatsApp";
       aviso("avisoEditor", "No se pudieron preparar las fotos (" + e.message + "). Revisa tu conexión.", "warn");
     });
@@ -1210,17 +1322,26 @@
   /* =========================================================
      Guardar
      ========================================================= */
+  function errorEnCampo(id, texto) {
+    aviso("avisoEditor", texto, "error");
+    $(id).focus(); $(id).scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   $("btnGuardar").onclick = function () {
+    if (guardando) return;
+    if (!esAdmin) { aviso("avisoEditor", "Tu cuenta no está autorizada para publicar. Avísale a Nelson.", "error"); return; }
     if (subidasEnCurso > 0) {
       aviso("avisoEditor", "Espera a que terminen de subir las fotos.", "warn");
       return;
     }
     var datos = datosDelFormulario();
-    if (!datos.title) {
-      aviso("avisoEditor", "Falta el título del aviso. Es lo único obligatorio (puedes apretar «Sugerir»).", "error");
-      $("fTitle").focus(); $("fTitle").scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
+    if (!datos.title) return errorEnCampo("fTitle", "Falta el título del aviso. Es lo único obligatorio (puedes apretar «Sugerir»).");
+    if ($("fPrecio").value.trim() && (num("fPrecio") == null || num("fPrecio") <= 0))
+      return errorEnCampo("fPrecio", "Revisa el precio: escribe solo números, por ejemplo 150000000 o 150.000.000.");
+    if (!enteroValido("fBedrooms"))  return errorEnCampo("fBedrooms", "Dormitorios va en número entero, sin decimales (ej: 3).");
+    if (!enteroValido("fBathrooms")) return errorEnCampo("fBathrooms", "Baños va en número entero, sin decimales (ej: 2).");
+    if ($("fSurface").value.trim() && num("fSurface") == null) return errorEnCampo("fSurface", "Revisa los metros construidos: solo números (ej: 95 o 117,5).");
+    if ($("fTerrain").value.trim() && num("fTerrain") == null) return errorEnCampo("fTerrain", "Revisa los metros de terreno: solo números (ej: 250).");
     datos.images = fotos.map(function (f) { return f.url; });
     delete datos.codigo;
 
@@ -1232,24 +1353,41 @@
     guardar(datos);
   };
 
+  function bloquearSalida(si) {
+    guardando = si;
+    $("btnCancelar").disabled = si;
+    $("btnEliminar").disabled = si;
+  }
+
   function guardar(datos) {
     var btn = $("btnGuardar");
     btn.disabled = true; btn.textContent = "Guardando…";
+    bloquearSalida(true);
     aviso("avisoEditor", "");
     var eraNueva = !editando;
+    var gen = sesionEditor;
+    var miId = idNuevo;
 
+    // La propiedad nueva lleva un id fijo desde que se abrió el editor. Si se corta
+    // internet justo al guardar y ella vuelve a apretar Guardar, no se duplica:
+    // detectamos que ya existe y seguimos como si nada.
     function insertar(codigo) {
       datos.codigo = codigo;
+      if (miId) datos.id = miId;
       return sb.from("propiedades").insert(datos).select().single().then(function (res) {
-        // Si ese código ya estaba tomado, pedimos el siguiente y reintentamos.
-        if (res.error && /duplicate key|already exists|23505/i.test(res.error.message || res.error.code || "")) {
+        if (!(res.error && /duplicate key|already exists|23505/i.test((res.error.message || "") + " " + (res.error.code || "")))) return res;
+        var yaExiste = miId
+          ? sb.from("propiedades").select("*").eq("id", miId).then(function (r) { return (r.data && r.data[0]) || null; })
+          : Promise.resolve(null);
+        return yaExiste.then(function (fila) {
+          if (fila) return { data: fila, error: null };            // el guardado anterior sí había llegado
+          // El código lo tomó otra propiedad: pedimos el siguiente y reintentamos.
           return sb.rpc("siguiente_codigo").then(function (r) {
             if (r.error) throw r.error;
             datos.codigo = r.data;
             return sb.from("propiedades").insert(datos).select().single();
           });
-        }
-        return res;
+        });
       });
     }
 
@@ -1268,14 +1406,16 @@
     conTimeout(trabajo, 30000).then(function (res) {
       if (res.error) throw res.error;
       var fila = res.data;
+      bloquearSalida(false);
 
       // Recién ahora borramos de verdad las fotos que quitó.
       borrarDeStorage(fotosBorrar);
       fotosBorrar = [];
 
-      sucio = false;
-      borrarBorrador();
       btn.disabled = false; btn.textContent = "Guardar";
+      if (gen !== sesionEditor) { cargarPropiedades(); return; }
+      sucio = false;
+      borrarBorradorPropio();
       cerrarEditor();
       cargarPropiedades();
 
@@ -1291,8 +1431,11 @@
       }
       avisoHtml("avisoLista", html, "ok");
     }).catch(function (err) {
+      bloquearSalida(false);
       btn.disabled = false; btn.textContent = "Guardar";
-      aviso("avisoEditor", "No se pudo guardar: " + mensajeError(err), "error");
+      if (gen !== sesionEditor) return;
+      aviso("avisoEditor", "No se pudo guardar: " + mensajeError(err) +
+        " Tus cambios siguen en pantalla: vuelve a apretar Guardar.", "error");
       window.scrollTo(0, 0);
     });
   }
@@ -1301,7 +1444,7 @@
      Eliminar
      ========================================================= */
   $("btnEliminar").onclick = function () {
-    if (!editando) return;
+    if (!editando || guardando) return;
     var p = editando;
     confirmar(
       "Eliminar propiedad",
@@ -1312,8 +1455,9 @@
         var paths = fotos.map(function (f) { return f.path; }).filter(Boolean).concat(fotosBorrar);
         var btn = $("btnEliminar");
         btn.disabled = true; btn.textContent = "Eliminando…";
-        conTimeout(sb.from("propiedades").delete().eq("id", p.id), 20000).then(function (res) {
+        conTimeout(sb.from("propiedades").delete().eq("id", p.id).select("id"), 20000).then(function (res) {
           if (res.error) throw res.error;
+          if (!res.data || !res.data.length) throw new Error("PGRST116");
           borrarDeStorage(paths);
           btn.disabled = false; btn.textContent = "Eliminar";
           cerrarEditor(true);

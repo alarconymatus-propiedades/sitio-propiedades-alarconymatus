@@ -9,72 +9,106 @@ sin tocar código. Los datos y las fotos nuevas viven en Supabase.
 
 ---
 
-## Puesta en marcha (10 minutos, una sola vez)
+## Puesta en marcha (15 minutos, una sola vez)
+
+> Ya hecho el 2026-10-11: proyecto `aym-propiedades` (São Paulo), usuaria de
+> Fanny creada, `setup.sql` ejecutado y `assets/config.js` conectado. Esta
+> sección queda para rehacerlo o para un proyecto nuevo.
 
 ### 1. Crear el proyecto en Supabase
 
-1. Entra a [supabase.com](https://supabase.com) → *Start your project* (plan gratuito).
-2. *New project*: nombre `aym-propiedades`, región **South America (São Paulo)**,
-   y una contraseña de base de datos (guárdala; no se vuelve a usar desde el sitio).
-3. Espera a que termine de crearse (1-2 minutos).
+1. Entra a [supabase.com](https://supabase.com) → *Start your project* → *Continue with GitHub*.
+2. *New organization*: tipo **Personal**, plan **Free**.
+3. *New project*: nombre `aym-propiedades`, región **South America (São Paulo)**,
+   contraseña de base de datos generada (guárdala; el sitio no la usa y
+   **no se comparte con nadie**). Deja activado *Enable Data API*.
+4. Espera a que diga *Healthy* (1-2 minutos).
 
-### 2. Crear el usuario que va a publicar
+### 2. Crear el usuario que va a publicar y cerrar el registro
 
-**Authentication → Users → Add user → Create new user**: correo y contraseña
-de Fanny, y marca **Auto Confirm User**.
+1. **Authentication → Users → Add user → Create new user**: correo y
+   contraseña de Fanny, y marca **Auto Confirm User**.
+2. **Authentication → Sign In / Providers**: apaga **Allow new users to sign up**
+   y guarda. Así nadie puede crearse una cuenta por su cuenta.
 
-Hazlo **antes** del paso 3: el SQL registra como administradoras a todas
-las cuentas que existan en ese momento. Para agregar otra persona después:
-**Table Editor → administradores → Insert row** con su correo (y crear su
-usuario en Authentication).
+Hazlo **antes** del paso 3: la primera vez, el SQL registra como
+administradoras a las cuentas confirmadas que existan en ese momento. Si la
+lista ya tiene a alguien, volver a ejecutarlo no agrega a nadie más.
+
+Para agregar otra persona después: créale usuario en Authentication y
+agrega su correo en **Table Editor → administradores → Insert row** (da lo
+mismo si lo escribes con mayúsculas: se guarda en minúsculas).
 
 ### 3. Crear las tablas, el almacén de fotos y cargar las propiedades
 
-**SQL Editor → New query**, pega el contenido completo de
-[`supabase/setup.sql`](supabase/setup.sql) y **Run**.
+**SQL Editor** (ícono `>_`) **→ New query**, pega el contenido completo de
+[`supabase/setup.sql`](supabase/setup.sql) y **Run**. Si aparece el aviso
+*destructive operation*, confirma con **Run this query**: es esperado (solo
+reemplaza reglas de permisos). Debe terminar en *Success. No rows returned*.
 
-Crea la tabla `propiedades`, la lista de `administradores`, el bucket
-`fotos` con sus permisos, y carga las 14 propiedades que ya existían
-(10 visibles + 4 rescatadas de carpetas de fotos sin ficha, que quedan
-ocultas para revisarlas en el panel). Se puede ejecutar más de una vez.
+Crea la tabla `propiedades` con sus permisos, la lista de `administradores`,
+el bucket `fotos`, y carga las 14 propiedades que ya existían (10 visibles
++ 4 rescatadas de carpetas de fotos sin ficha, que quedan ocultas para
+revisarlas en el panel). Se puede ejecutar más de una vez.
+
+> Supabase ya no expone automáticamente las tablas nuevas a la API (cambio
+> de mayo de 2026). Por eso `setup.sql` trae los `GRANT` escritos a mano.
 
 ### 4. Conectar el sitio
 
-**Settings → API** → copia los dos valores y pégalos en
-[`assets/config.js`](assets/config.js) (se puede editar directo en GitHub
-con el lápiz, y hacer *Commit changes*):
+Botón verde **Connect** (arriba) → pestaña **Framework**: ahí aparecen la
+*Project URL* y la **Publishable key** (empieza con `sb_publishable_`).
+También están en **Project Settings → API Keys**. Pégalas en
+[`assets/config.js`](assets/config.js):
 
 ```js
 SUPABASE_URL:      "https://xxxxxxxx.supabase.co",
-SUPABASE_ANON_KEY: "eyJhbGciOi...",
+SUPABASE_ANON_KEY: "sb_publishable_...",
 ```
 
-> La llave `anon` es **pública por diseño** y va en el HTML sin riesgo:
+> La *publishable key* es **pública por diseño** y va en el HTML sin riesgo:
 > quien protege los datos son las políticas RLS del `setup.sql`.
-> **Nunca** pegar aquí la llave `service_role`.
+> **Nunca** pegues aquí la *Secret key* (`sb_secret_…`) ni la antigua
+> `service_role`; `config.js` rechaza una llave que empiece con `sb_secret_`.
 
 Uno o dos minutos después del commit, GitHub Pages publica el cambio. Abre
 `/admin.html`: abajo del formulario de entrada dice **«Conectado · N
 propiedades publicadas»** si todo quedó bien, o te dice qué falta.
 
-### 5. Ajustes de Authentication (5 clics)
+### 5. Ajustes de Authentication
 
-- **Providers → Email**: dejar *Enable Email provider* activado y
-  **desactivar *Enable sign-ups***. Así nadie puede crearse una cuenta;
-  los usuarios los creas tú. (Aunque alguien lo lograra, sin estar en
-  `administradores` no puede tocar nada.)
-- **Providers**: todos los demás (Google, GitHub, Anonymous…) desactivados.
-- **Sign In / Providers → Password**: *Minimum password length* **8**.
+- **Sign In / Providers**: *Allow new users to sign up* **apagado** (paso 2).
+  Deja *Email* activado y todos los demás proveedores (Google, GitHub,
+  Anonymous…) apagados. En *Email*, *Minimum password length* **8**.
 - **URL Configuration**: *Site URL* `https://www.alarconymatuspropiedades.cl`
-  y en *Redirect URLs* agregar `https://www.alarconymatuspropiedades.cl/admin.html`
-  (necesario para «¿Olvidaste tu contraseña?»).
-- **Attack Protection**: activar *Leaked password protection* si está disponible.
+  y en *Redirect URLs* agrega `https://www.alarconymatuspropiedades.cl/admin.html`.
+- **Attack Protection**: activa *Leaked password protection* si está disponible.
+
+**Sobre «¿Olvidaste tu contraseña?»:** sin un servidor de correo propio,
+Supabase solo envía correos a los miembros del equipo del proyecto y como
+máximo 2 por hora, así que a Fanny probablemente no le llegue. Dos salidas:
+
+- **Simple (recomendada por ahora):** Nelson le cambia la clave. En
+  **Authentication → Users**, abre el usuario de Fanny y usa la opción de
+  enviar recuperación o, si no hay correo, ejecuta en **SQL Editor**:
+
+  ```sql
+  update auth.users
+     set encrypted_password = crypt('NUEVA-CLAVE-AQUI', gen_salt('bf'))
+   where email = 'correo-de-fanny@gmail.com';
+  ```
+
+- **Definitiva:** **Authentication → Emails → SMTP Settings → Enable custom
+  SMTP** con Gmail (`smtp.gmail.com`, puerto 465, usuario
+  `alarconymatus@gmail.com` y una *contraseña de aplicación* de Google) o con
+  Resend/Brevo gratis. Después sube el límite en **Rate Limits**.
 
 ### 6. Probar
 
-Entra a `/admin.html` con el correo de Fanny, abre una propiedad, toca
-**Guardar** sin cambiar nada y luego **Ver en el sitio**. Si eso funciona,
-funciona todo.
+Entra a `/admin.html` con el correo de Fanny y toca **Publicar nueva
+propiedad**: sube una foto, toca **Sugerir**, desmarca *Mostrar en el sitio*
+y **Guardar**. Abre esa propiedad, toca **Eliminar**. Si eso funciona, están
+probados la tabla, los permisos y el almacén de fotos.
 
 ---
 

@@ -15,8 +15,9 @@ saber nada de computación: solo seguir los pasos.
 > Consejo: guarda esa dirección en la pantalla de inicio del celular
 > (en Chrome: menú ⋮ → «Agregar a pantalla de inicio»). Queda como una app.
 
-**¿Olvidaste la contraseña?** Escribe tu correo, toca «¿Olvidaste tu
-contraseña?» y te llega un correo con un enlace para crear una nueva.
+**¿Olvidaste la contraseña?** Escribe tu correo y toca «¿Olvidaste tu
+contraseña?». Si en 10 minutos no te llega un correo (revisa también la
+carpeta de spam), pídele a Nelson que te la cambie.
 
 ---
 
@@ -42,12 +43,15 @@ contraseña?» y te llega un correo con un enlace para crear una nueva.
 4. **Llena los datos.** Lo que no corresponda, déjalo vacío.
    - **Operación**: Venta o Arriendo.
    - **Tipo**, **Comuna** y **Sector**.
-   - **Precio**: escribe los números con o sin puntos (150.000.000 o
-     150000000, da lo mismo). Abajo te muestra cómo se va a ver.
+   - **Precio**: primero elige **Pesos** o **UF**. Después escribe los
+     números con o sin puntos (150.000.000 o 150000000, da lo mismo).
+     Abajo te muestra cómo se va a ver: revísalo.
+   - **Dormitorios y baños**: números enteros, sin decimales.
    - **Título**: toca **«Sugerir»** y el panel lo arma solo con lo que ya
      llenaste. Puedes cambiarlo.
-   - **Descripción**: escribe el aviso como siempre. **No pongas el teléfono
-     ni las redes**: el sitio los agrega solo al final.
+   - **Descripción**: escribe el aviso como siempre. **No hace falta poner
+     el teléfono ni las redes**: la página de cada propiedad ya tiene botones
+     de *WhatsApp* y *Llamar*, y el aviso que copias para redes los agrega solo.
 
 5. Toca **Guardar**.
 
@@ -59,25 +63,28 @@ redes»**.
 
 ## Compartir en Facebook, Instagram o WhatsApp
 
-Dentro de cada propiedad, al final, está la sección **Compartir en redes**:
+Dentro de cada propiedad, al final, está la sección **Compartir en redes**.
+Los botones se activan **después de guardar** la propiedad por primera vez.
 
 | Botón | Qué hace |
 |---|---|
 | **Copiar aviso para Facebook / Instagram** | Copia el texto completo del aviso (título, descripción, precio, enlace, teléfonos y redes) listo para pegar. |
-| **Preparar fotos para Instagram / WhatsApp** | Primer toque: prepara las fotos. Segundo toque: te pregunta a qué app enviarlas. |
-| **Compartir enlace por WhatsApp** | Manda el enlace de la propiedad a quien quieras. |
-| **Ver en el sitio** | Abre la propiedad tal como la ve la gente. |
+| **Preparar fotos para Instagram / WhatsApp** | Primer toque: prepara las fotos (hasta 10). Segundo toque: te pregunta a qué app enviarlas. Funciona desde el celular. |
+| **Compartir enlace por WhatsApp** | Abre el menú de compartir del celular: elige WhatsApp y a quién mandarlo. |
+| **Ver en el sitio** | Abre la propiedad tal como la ve la gente. Solo aparece si la propiedad está publicada (no oculta). |
 
 **Para publicar en Instagram desde el celular:**
 
 1. Toca **«Preparar fotos»** y espera.
-2. Toca de nuevo (ahora dice **«Enviar fotos ahora»**) y elige **Instagram**.
+2. Toca de nuevo (ahora dice **«Enviar 10 fotos ahora»**, o el número que
+   tenga) y elige **Instagram**.
 3. Instagram se abre con las fotos. Sigue hasta la pantalla de la descripción.
 4. Mantén presionado el cuadro de texto y toca **Pegar**: el aviso ya está copiado.
 5. Publica.
 
-En Facebook es igual, o puedes pegar solo el enlace: Facebook muestra la
-foto y el título solo.
+En Facebook es igual. Si pegas solo el enlace, Facebook y WhatsApp muestran
+el logo de AYM y un título general, no la foto de la casa; por eso conviene
+publicar con las fotos.
 
 ---
 
@@ -95,6 +102,9 @@ En la lista, cada propiedad tiene sus botones:
 | **Editar** | Abre la propiedad para cambiar datos o fotos. |
 | **Compartir** | Va directo a la sección de redes. |
 
+**Si una propiedad *reservada* se vende o se arrienda:** toca **Editar**, en
+*Estado* elige **Ya se vendió** (o **Ya se arrendó**) y toca **Guardar**.
+
 ---
 
 ## ¿Cuál uso: «ocultar» o «marcar vendida»?
@@ -111,9 +121,10 @@ además* toca «Ocultar del sitio».
 
 ---
 
-## Sobre el botón rojo «Eliminar»
+## Sobre el botón «Eliminar»
 
-Está dentro de *Editar*, abajo a la izquierda.
+Está dentro de *Editar*, al final de todo (en el celular es el último botón,
+con letras rojas).
 
 **Borra la propiedad y todas sus fotos para siempre. No se puede recuperar.**
 
@@ -125,10 +136,12 @@ lo mismo de cara al público y se puede deshacer.
 ## Si se te cierra sin querer
 
 El panel guarda solo lo que vas escribiendo. Si se cierra la página, se
-apaga el celular o tocas «atrás» sin querer, al volver a entrar y tocar
-«Publicar nueva propiedad» (o «Editar» en la misma propiedad) te pregunta:
-**«¿Quieres seguir con eso?»**. Toca **Sí, seguir** y aparece todo como lo
-dejaste, fotos incluidas.
+apaga el celular o tocas «atrás» sin querer, entra **directo** a «Publicar
+nueva propiedad» (o a «Editar» en la misma propiedad que estabas
+cambiando). Te va a preguntar **«¿Quieres seguir con eso?»**:
+
+- **Sí, seguir** → aparece todo como lo dejaste, fotos incluidas.
+- **Empezar de cero** → se borra lo que tenías a medio hacer, fotos incluidas.
 
 ---
 
@@ -152,8 +165,13 @@ mándatela por WhatsApp y guárdala: así queda en formato normal.
 Es normal con muchas fotos o poca señal. El panel las achica solo para
 que la página cargue rápido. Mantén la página abierta hasta que termine.
 
+**Dice que no se pudo guardar.**
+Lo que escribiste sigue en pantalla. Revisa tu internet y vuelve a tocar
+*Guardar*: no se duplica.
+
 **Dice que el correo o la contraseña no son correctos.**
-Revisa las mayúsculas. Si sigue igual, usa «¿Olvidaste tu contraseña?».
+Revisa las mayúsculas. Si sigue igual, usa «¿Olvidaste tu contraseña?» o
+pídele a Nelson que te la cambie.
 
 **No aparece lo que acabo de guardar en la página.**
 Cierra la página del sitio y vuelve a abrirla.

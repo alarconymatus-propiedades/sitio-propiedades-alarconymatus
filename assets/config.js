@@ -1,20 +1,23 @@
 /* ============================================================
    AYM Propiedades — Configuración
    ------------------------------------------------------------
-   REEMPLAZAR los dos valores de SUPABASE con los de tu proyecto:
-     Supabase -> Settings -> API
-       * Project URL   -> SUPABASE_URL
-       * anon public   -> SUPABASE_ANON_KEY
+   Los dos valores de SUPABASE salen de tu proyecto:
+     * Project URL      -> SUPABASE_URL
+         (Project Settings -> Data API, o arriba en el inicio del proyecto)
+     * Publishable key  -> SUPABASE_ANON_KEY
+         (Project Settings -> API Keys; empieza con sb_publishable_.
+          En proyectos antiguos se llamaba "anon public" y empezaba con eyJ)
 
-   La llave "anon" es PÚBLICA por diseño y puede vivir en el HTML
-   sin riesgo: quien protege los datos son las políticas RLS de
+   Esa llave es PÚBLICA por diseño y puede vivir en el HTML sin
+   riesgo: quien protege los datos son las políticas RLS de
    supabase/schema.sql, no el secreto de esta llave.
 
-   NUNCA pegar aquí la llave "service_role".
+   NUNCA pegar aquí la "Secret key" (sb_secret_...) ni la antigua
+   "service_role": esas sí dan acceso total.
    ============================================================ */
 window.AYM_CONFIG = {
-  SUPABASE_URL:      "https://TU-PROYECTO.supabase.co",
-  SUPABASE_ANON_KEY: "PEGAR-AQUI-LA-LLAVE-ANON-PUBLIC",
+  SUPABASE_URL:      "https://raxjdnoqvyvlsdzdgvqo.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_9FdU5zcjfqgjxA7f6tDMUg_Baq6qrry",
 
   // Mientras Supabase no esté configurado, el sitio sigue
   // funcionando leyendo data/properties.json.
@@ -56,7 +59,8 @@ window.AYM_CONFIG = {
     return !!c.SUPABASE_URL &&
            c.SUPABASE_URL.indexOf("TU-PROYECTO") === -1 &&
            !!c.SUPABASE_ANON_KEY &&
-           c.SUPABASE_ANON_KEY.indexOf("PEGAR-AQUI") === -1;
+           c.SUPABASE_ANON_KEY.indexOf("PEGAR-AQUI") === -1 &&
+           c.SUPABASE_ANON_KEY.indexOf("sb_secret_") !== 0;   // jamás una llave secreta en el navegador
   };
 
   /* ---- Carga la librería de Supabase (o el simulador) una sola vez.

@@ -87,12 +87,31 @@ alter table public.administradores enable row level security;
 -- Sin políticas: nadie la lee ni la edita desde el sitio. Solo desde el
 -- panel de Supabase (Table Editor) o con es_admin() más abajo.
 
--- Al ejecutar este archivo, todos los usuarios que YA existen en
--- Authentication -> Users quedan como administradores. Por eso el README
--- pide crear el usuario antes de correr este SQL. Para agregar otro
--- después: Table Editor -> administradores -> Insert row.
+-- Los correos se guardan siempre en minúsculas y sin espacios, aunque se
+-- escriban a mano en el Table Editor ("Fanny@Gmail.com " -> "fanny@gmail.com").
+create or replace function public.normalizar_email_admin()
+returns trigger language plpgsql set search_path = public as $$
+begin
+  new.email = lower(trim(new.email));
+  return new;
+end $$;
+
+drop trigger if exists administradores_normaliza on public.administradores;
+create trigger administradores_normaliza
+  before insert or update on public.administradores
+  for each row execute function public.normalizar_email_admin();
+
+-- PRIMERA VEZ: si la lista está vacía, las cuentas confirmadas que ya existen
+-- en Authentication -> Users quedan como administradoras. Por eso el README
+-- pide crear el usuario antes de correr este SQL. Si la lista ya tiene a
+-- alguien, volver a ejecutar este archivo NO agrega a nadie más.
+-- Para agregar otra persona después: Table Editor -> administradores -> Insert row.
 insert into public.administradores (email)
-select lower(email) from auth.users where email is not null
+select lower(trim(email)) from auth.users
+where coalesce(email, '') <> ''
+  and email_confirmed_at is not null
+  and coalesce(is_anonymous, false) = false
+  and not exists (select 1 from public.administradores)
 on conflict (email) do nothing;
 
 create or replace function public.es_admin()
@@ -100,10 +119,11 @@ returns boolean
 language sql stable security definer
 set search_path = public
 as $$
-  select exists (
-    select 1 from public.administradores a
-    where a.email = lower(coalesce(auth.jwt() ->> 'email', ''))
-  );
+  select coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) = false
+     and exists (
+       select 1 from public.administradores a
+       where a.email = lower(trim(coalesce(auth.jwt() ->> 'email', '')))
+     );
 $$;
 revoke all on function public.es_admin() from public;
 grant execute on function public.es_admin() to authenticated, anon;
@@ -125,7 +145,17 @@ $$;
 revoke all on function public.siguiente_codigo() from public, anon;
 grant execute on function public.siguiente_codigo() to authenticated;
 
--- ---------- 4. PERMISOS (RLS) ----------
+-- ---------- 4. PERMISOS ----------
+-- a) Qué OPERACIONES puede intentar cada rol desde la API. Se deja explícito
+--    para no depender de la opción "Automatically expose new tables" con que
+--    se haya creado el proyecto.
+revoke all on public.propiedades     from anon, authenticated;
+revoke all on public.administradores from anon, authenticated;
+grant usage on schema public to anon, authenticated;
+grant select                         on public.propiedades to anon;
+grant select, insert, update, delete on public.propiedades to authenticated;
+
+-- b) Qué FILAS (RLS): las políticas de abajo.
 alter table public.propiedades enable row level security;
 
 -- Políticas de versiones anteriores (si existen, se reemplazan)
@@ -135,10 +165,11 @@ drop policy if exists "admin escribe"        on public.propiedades;
 drop policy if exists "admin actualiza"      on public.propiedades;
 drop policy if exists "admin borra"          on public.propiedades;
 
--- El público (sitio web) SOLO ve las propiedades marcadas como visibles.
+-- Cualquiera (también alguien con sesión que no es administradora) ve
+-- SOLO las propiedades marcadas como visibles.
 create policy "publico lee visibles"
   on public.propiedades for select
-  to anon
+  to anon, authenticated
   using (visible = true);
 
 -- Las administradoras ven TODO, incluso lo oculto.

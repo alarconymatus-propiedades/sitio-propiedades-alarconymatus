@@ -42,7 +42,7 @@ function cardHtml(p){
   const mini = p.coverThumb || p.cover;
   const foto = p.cover
     ? `<img src="${esc(mini)}" data-grande="${esc(p.cover)}" alt="${esc(p.title)}" loading="lazy"
-           onerror="if(this.dataset.grande&&this.src!==this.dataset.grande){this.src=this.dataset.grande}else{this.onerror=null}">`
+           onerror="this.onerror=null;if(this.dataset.grande&&this.getAttribute('src')!==this.dataset.grande)this.src=this.dataset.grande">`
     : `<div class="sinfoto">Sin foto</div>`;
   return `
   <article class="card${noDisponible ? " card-" + esc(p.status.toLowerCase()) : ""}">

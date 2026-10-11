@@ -108,6 +108,8 @@
   Consulta.prototype.delete = function ()  { this.op = "delete"; return this; };
   Consulta.prototype.eq = function (c, v) { this.filtros.push([c, v]); return this; };
   Consulta.prototype.order = function (c, o) { this.ordenes.push([c, !o || o.ascending !== false]); return this; };
+  Consulta.prototype.range = function (a, b) { this.rango = [a, b]; return this; };
+  Consulta.prototype.limit = function (n) { this.rango = [0, n - 1]; return this; };
   Consulta.prototype.single = function () { this.unico = true; return this; };
   Consulta.prototype.then = function (ok, ko) { return this._correr().then(ok, ko); };
 
@@ -134,11 +136,13 @@
             return (x < y ? -1 : 1) * (o[1] ? 1 : -1);
           });
         });
-        if (self.head) return { data: null, count: self.contar ? vis.length : null, error: null };
+        var total = vis.length;
+        if (self.rango) vis = vis.slice(self.rango[0], self.rango[1] + 1);
+        if (self.head) return { data: null, count: self.contar ? total : null, error: null };
         if (self.unico) return vis.length === 1
           ? { data: vis[0], error: null }
           : { data: null, error: err("JSON object requested, multiple (or no) rows returned", "PGRST116") };
-        return { data: vis, count: self.contar ? vis.length : null, error: null };
+        return { data: vis, count: self.contar ? total : null, error: null };
       }
 
       if (!autenticado)
@@ -151,8 +155,14 @@
         }, self.payload);
         var e = validar(nueva); if (e) return { data: null, error: e };
         if (!nueva.codigo) return { data: null, error: err('null value in column "codigo" violates not-null constraint', "23502") };
+        if (todas.some(function (f) { return f.id === nueva.id; }))
+          return { data: null, error: err('duplicate key value violates unique constraint "propiedades_pkey"', "23505") };
         if (todas.some(function (f) { return f.codigo === nueva.codigo; }))
           return { data: null, error: err('duplicate key value violates unique constraint "propiedades_codigo_key"', "23505") };
+        ["bedrooms", "bathrooms"].forEach(function (k) {
+          if (nueva[k] != null && Math.floor(nueva[k]) !== nueva[k]) e = err('invalid input syntax for type integer: "' + nueva[k] + '"', "22P02");
+        });
+        if (e) return { data: null, error: e };
         todas.push(nueva); guardarFilas(todas);
         return { data: self.retornar ? (self.unico ? nueva : [nueva]) : null, error: null };
       }
@@ -170,9 +180,10 @@
       }
 
       if (self.op === "delete") {
+        var borradas = todas.filter(pasa);
         var quedan = todas.filter(function (f) { return !pasa(f); });
         guardarFilas(quedan);
-        return { data: null, error: null };
+        return { data: self.retornar ? borradas : null, error: null };
       }
       return { data: null, error: err("operación no soportada en el simulador") };
     });
@@ -219,6 +230,11 @@
       },
       from: function (tabla) { return new Consulta(tabla); },
       rpc: function (fn) {
+        if (fn === "es_admin") {
+          var s = sesionActual();
+          // Para probar una cuenta no autorizada: entrar con un correo que empiece con "noadmin"
+          return Promise.resolve({ data: !!s && !/^noadmin/i.test(s.user.email || ""), error: null });
+        }
         if (fn !== "siguiente_codigo")
           return Promise.resolve({ data: null, error: err("function " + fn + " does not exist", "42883") });
         return filas().then(function (todas) {
